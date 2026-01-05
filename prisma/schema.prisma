@@ -31,3 +31,37 @@ enum Role {
   superAdmin
   admin
 }
+
+model Student {
+  id           Int          @id @default(autoincrement())
+  name         String
+  phone_number String
+  student_id   String
+  enrollments  Enrollment[]
+}
+
+model Course {
+  id          Int          @id @default(autoincrement())
+  name        String
+  fee         Float
+  payments    Payment[]
+  enrollments Enrollment[]
+}
+
+model Payment {
+  id             Int    @id @default(autoincrement())
+  payment_method String
+  fee            Float
+  courseId       Int
+  course         Course @relation(fields: [courseId], references: [id])
+}
+
+model Enrollment {
+  studentId  Int
+  courseId   Int
+  student    Student  @relation(fields: [studentId], references: [id])
+  course     Course   @relation(fields: [courseId], references: [id])
+  assignedAt DateTime @default(now())
+
+  @@id([studentId, courseId])
+}

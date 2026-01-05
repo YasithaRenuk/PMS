@@ -1,0 +1,33 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/app/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Branch {
+  id          Int     @id @default(autoincrement())
+  branch_name String
+  show_id     String
+  users       User[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  role      Role     @default(admin)
+  branchId  Int?
+  branch    Branch?  @relation(fields: [branchId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  superAdmin
+  admin
+}

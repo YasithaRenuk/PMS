@@ -13,7 +13,8 @@ model Branch {
   show_id     String
   users       User[]
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  updatedAt   DateTime @updatedAtz
+  deletedAt   DateTime?
 }
 
 model User {
@@ -25,6 +26,7 @@ model User {
   branch    Branch?  @relation(fields: [branchId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 }
 
 enum Role {
@@ -38,6 +40,7 @@ model Student {
   phone_number String
   student_id   String
   enrollments  Enrollment[]
+  deletedAt    DateTime?
 }
 
 model Course {
@@ -46,6 +49,7 @@ model Course {
   fee         Float
   payments    Payment[]
   enrollments Enrollment[]
+  deletedAt   DateTime?
 }
 
 model Payment {
@@ -54,6 +58,7 @@ model Payment {
   fee            Float
   courseId       Int
   course         Course @relation(fields: [courseId], references: [id])
+  deletedAt      DateTime?
 }
 
 model Enrollment {
@@ -62,6 +67,7 @@ model Enrollment {
   student    Student  @relation(fields: [studentId], references: [id])
   course     Course   @relation(fields: [courseId], references: [id])
   assignedAt DateTime @default(now())
+  deletedAt  DateTime?
 
   @@id([studentId, courseId])
 }

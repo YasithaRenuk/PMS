@@ -39,6 +39,7 @@ export type StudentMinAggregateOutputType = {
   name: string | null
   phone_number: string | null
   student_id: string | null
+  deletedAt: Date | null
 }
 
 export type StudentMaxAggregateOutputType = {
@@ -46,6 +47,7 @@ export type StudentMaxAggregateOutputType = {
   name: string | null
   phone_number: string | null
   student_id: string | null
+  deletedAt: Date | null
 }
 
 export type StudentCountAggregateOutputType = {
@@ -53,6 +55,7 @@ export type StudentCountAggregateOutputType = {
   name: number
   phone_number: number
   student_id: number
+  deletedAt: number
   _all: number
 }
 
@@ -70,6 +73,7 @@ export type StudentMinAggregateInputType = {
   name?: true
   phone_number?: true
   student_id?: true
+  deletedAt?: true
 }
 
 export type StudentMaxAggregateInputType = {
@@ -77,6 +81,7 @@ export type StudentMaxAggregateInputType = {
   name?: true
   phone_number?: true
   student_id?: true
+  deletedAt?: true
 }
 
 export type StudentCountAggregateInputType = {
@@ -84,6 +89,7 @@ export type StudentCountAggregateInputType = {
   name?: true
   phone_number?: true
   student_id?: true
+  deletedAt?: true
   _all?: true
 }
 
@@ -178,6 +184,7 @@ export type StudentGroupByOutputType = {
   name: string
   phone_number: string
   student_id: string
+  deletedAt: Date | null
   _count: StudentCountAggregateOutputType | null
   _avg: StudentAvgAggregateOutputType | null
   _sum: StudentSumAggregateOutputType | null
@@ -208,6 +215,7 @@ export type StudentWhereInput = {
   name?: Prisma.StringFilter<"Student"> | string
   phone_number?: Prisma.StringFilter<"Student"> | string
   student_id?: Prisma.StringFilter<"Student"> | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
   enrollments?: Prisma.EnrollmentListRelationFilter
 }
 
@@ -216,6 +224,7 @@ export type StudentOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   phone_number?: Prisma.SortOrder
   student_id?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   enrollments?: Prisma.EnrollmentOrderByRelationAggregateInput
   _relevance?: Prisma.StudentOrderByRelevanceInput
 }
@@ -228,6 +237,7 @@ export type StudentWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Student"> | string
   phone_number?: Prisma.StringFilter<"Student"> | string
   student_id?: Prisma.StringFilter<"Student"> | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
   enrollments?: Prisma.EnrollmentListRelationFilter
 }, "id">
 
@@ -236,6 +246,7 @@ export type StudentOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   phone_number?: Prisma.SortOrder
   student_id?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.StudentCountOrderByAggregateInput
   _avg?: Prisma.StudentAvgOrderByAggregateInput
   _max?: Prisma.StudentMaxOrderByAggregateInput
@@ -251,12 +262,14 @@ export type StudentScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Student"> | string
   phone_number?: Prisma.StringWithAggregatesFilter<"Student"> | string
   student_id?: Prisma.StringWithAggregatesFilter<"Student"> | string
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Student"> | Date | string | null
 }
 
 export type StudentCreateInput = {
   name: string
   phone_number: string
   student_id: string
+  deletedAt?: Date | string | null
   enrollments?: Prisma.EnrollmentCreateNestedManyWithoutStudentInput
 }
 
@@ -265,6 +278,7 @@ export type StudentUncheckedCreateInput = {
   name: string
   phone_number: string
   student_id: string
+  deletedAt?: Date | string | null
   enrollments?: Prisma.EnrollmentUncheckedCreateNestedManyWithoutStudentInput
 }
 
@@ -272,6 +286,7 @@ export type StudentUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone_number?: Prisma.StringFieldUpdateOperationsInput | string
   student_id?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   enrollments?: Prisma.EnrollmentUpdateManyWithoutStudentNestedInput
 }
 
@@ -280,6 +295,7 @@ export type StudentUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone_number?: Prisma.StringFieldUpdateOperationsInput | string
   student_id?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   enrollments?: Prisma.EnrollmentUncheckedUpdateManyWithoutStudentNestedInput
 }
 
@@ -288,12 +304,14 @@ export type StudentCreateManyInput = {
   name: string
   phone_number: string
   student_id: string
+  deletedAt?: Date | string | null
 }
 
 export type StudentUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone_number?: Prisma.StringFieldUpdateOperationsInput | string
   student_id?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type StudentUncheckedUpdateManyInput = {
@@ -301,6 +319,7 @@ export type StudentUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone_number?: Prisma.StringFieldUpdateOperationsInput | string
   student_id?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type StudentOrderByRelevanceInput = {
@@ -314,6 +333,7 @@ export type StudentCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   phone_number?: Prisma.SortOrder
   student_id?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type StudentAvgOrderByAggregateInput = {
@@ -325,6 +345,7 @@ export type StudentMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   phone_number?: Prisma.SortOrder
   student_id?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type StudentMinOrderByAggregateInput = {
@@ -332,6 +353,7 @@ export type StudentMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   phone_number?: Prisma.SortOrder
   student_id?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type StudentSumOrderByAggregateInput = {
@@ -361,6 +383,7 @@ export type StudentCreateWithoutEnrollmentsInput = {
   name: string
   phone_number: string
   student_id: string
+  deletedAt?: Date | string | null
 }
 
 export type StudentUncheckedCreateWithoutEnrollmentsInput = {
@@ -368,6 +391,7 @@ export type StudentUncheckedCreateWithoutEnrollmentsInput = {
   name: string
   phone_number: string
   student_id: string
+  deletedAt?: Date | string | null
 }
 
 export type StudentCreateOrConnectWithoutEnrollmentsInput = {
@@ -390,6 +414,7 @@ export type StudentUpdateWithoutEnrollmentsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone_number?: Prisma.StringFieldUpdateOperationsInput | string
   student_id?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type StudentUncheckedUpdateWithoutEnrollmentsInput = {
@@ -397,6 +422,7 @@ export type StudentUncheckedUpdateWithoutEnrollmentsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   phone_number?: Prisma.StringFieldUpdateOperationsInput | string
   student_id?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -435,6 +461,7 @@ export type StudentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   name?: boolean
   phone_number?: boolean
   student_id?: boolean
+  deletedAt?: boolean
   enrollments?: boolean | Prisma.Student$enrollmentsArgs<ExtArgs>
   _count?: boolean | Prisma.StudentCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["student"]>
@@ -446,9 +473,10 @@ export type StudentSelectScalar = {
   name?: boolean
   phone_number?: boolean
   student_id?: boolean
+  deletedAt?: boolean
 }
 
-export type StudentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "phone_number" | "student_id", ExtArgs["result"]["student"]>
+export type StudentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "phone_number" | "student_id" | "deletedAt", ExtArgs["result"]["student"]>
 export type StudentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   enrollments?: boolean | Prisma.Student$enrollmentsArgs<ExtArgs>
   _count?: boolean | Prisma.StudentCountOutputTypeDefaultArgs<ExtArgs>
@@ -464,6 +492,7 @@ export type $StudentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     name: string
     phone_number: string
     student_id: string
+    deletedAt: Date | null
   }, ExtArgs["result"]["student"]>
   composites: {}
 }
@@ -838,6 +867,7 @@ export interface StudentFieldRefs {
   readonly name: Prisma.FieldRef<"Student", 'String'>
   readonly phone_number: Prisma.FieldRef<"Student", 'String'>
   readonly student_id: Prisma.FieldRef<"Student", 'String'>
+  readonly deletedAt: Prisma.FieldRef<"Student", 'DateTime'>
 }
     
 

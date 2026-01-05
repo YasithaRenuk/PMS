@@ -3,6 +3,11 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export function LoginForm() {
   const router = useRouter();
@@ -25,7 +30,7 @@ export function LoginForm() {
     setLoading(false);
 
     if (result?.error) {
-      setError(result.error);
+      setError("Invalid credentials"); // result.error is often a URL param or vague, safe to just say invalid for now or pass it through if it's readable
       return;
     }
 
@@ -33,53 +38,49 @@ export function LoginForm() {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex w-full max-w-md flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-8 shadow-sm"
-    >
-      <div>
-        <h1 className="text-2xl font-semibold text-zinc-900">Login</h1>
-        <p className="mt-1 text-sm text-zinc-600">
+    <Card className="w-full max-w-md">
+      <CardHeader>
+        <CardTitle className="text-2xl">Login</CardTitle>
+        <CardDescription>
           Sign in with your username and password.
-        </p>
-      </div>
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="username">Username</Label>
+            <Input
+              id="username"
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+              placeholder="rootfo"
+              required
+            />
+          </div>
 
-      <label className="flex flex-col gap-2">
-        <span className="text-sm font-medium text-zinc-800">Username</span>
-        <input
-          value={username}
-          onChange={(event) => setUsername(event.target.value)}
-          className="h-11 rounded-lg border border-zinc-200 px-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:ring-2 focus:ring-zinc-200"
-          placeholder="rootfo"
-          required
-        />
-      </label>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Your password"
+              required
+            />
+          </div>
 
-      <label className="flex flex-col gap-2">
-        <span className="text-sm font-medium text-zinc-800">Password</span>
-        <input
-          type="password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          className="h-11 rounded-lg border border-zinc-200 px-3 text-zinc-900 outline-none transition focus:border-zinc-400 focus:ring-2 focus:ring-zinc-200"
-          placeholder="Your password"
-          required
-        />
-      </label>
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-      {error ? (
-        <p className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">
-          {error}
-        </p>
-      ) : null}
-
-      <button
-        type="submit"
-        disabled={loading}
-        className="flex h-11 items-center justify-center rounded-lg bg-black text-sm font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-400"
-      >
-        {loading ? "Signing in..." : "Sign in"}
-      </button>
-    </form>
+          <Button type="submit" disabled={loading} className="w-full">
+            {loading ? "Signing in..." : "Sign in"}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }

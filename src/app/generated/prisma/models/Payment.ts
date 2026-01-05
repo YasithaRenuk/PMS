@@ -43,6 +43,7 @@ export type PaymentMinAggregateOutputType = {
   payment_method: string | null
   fee: number | null
   courseId: number | null
+  deletedAt: Date | null
 }
 
 export type PaymentMaxAggregateOutputType = {
@@ -50,6 +51,7 @@ export type PaymentMaxAggregateOutputType = {
   payment_method: string | null
   fee: number | null
   courseId: number | null
+  deletedAt: Date | null
 }
 
 export type PaymentCountAggregateOutputType = {
@@ -57,6 +59,7 @@ export type PaymentCountAggregateOutputType = {
   payment_method: number
   fee: number
   courseId: number
+  deletedAt: number
   _all: number
 }
 
@@ -78,6 +81,7 @@ export type PaymentMinAggregateInputType = {
   payment_method?: true
   fee?: true
   courseId?: true
+  deletedAt?: true
 }
 
 export type PaymentMaxAggregateInputType = {
@@ -85,6 +89,7 @@ export type PaymentMaxAggregateInputType = {
   payment_method?: true
   fee?: true
   courseId?: true
+  deletedAt?: true
 }
 
 export type PaymentCountAggregateInputType = {
@@ -92,6 +97,7 @@ export type PaymentCountAggregateInputType = {
   payment_method?: true
   fee?: true
   courseId?: true
+  deletedAt?: true
   _all?: true
 }
 
@@ -186,6 +192,7 @@ export type PaymentGroupByOutputType = {
   payment_method: string
   fee: number
   courseId: number
+  deletedAt: Date | null
   _count: PaymentCountAggregateOutputType | null
   _avg: PaymentAvgAggregateOutputType | null
   _sum: PaymentSumAggregateOutputType | null
@@ -216,6 +223,7 @@ export type PaymentWhereInput = {
   payment_method?: Prisma.StringFilter<"Payment"> | string
   fee?: Prisma.FloatFilter<"Payment"> | number
   courseId?: Prisma.IntFilter<"Payment"> | number
+  deletedAt?: Prisma.DateTimeNullableFilter<"Payment"> | Date | string | null
   course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
 }
 
@@ -224,6 +232,7 @@ export type PaymentOrderByWithRelationInput = {
   payment_method?: Prisma.SortOrder
   fee?: Prisma.SortOrder
   courseId?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   course?: Prisma.CourseOrderByWithRelationInput
   _relevance?: Prisma.PaymentOrderByRelevanceInput
 }
@@ -236,6 +245,7 @@ export type PaymentWhereUniqueInput = Prisma.AtLeast<{
   payment_method?: Prisma.StringFilter<"Payment"> | string
   fee?: Prisma.FloatFilter<"Payment"> | number
   courseId?: Prisma.IntFilter<"Payment"> | number
+  deletedAt?: Prisma.DateTimeNullableFilter<"Payment"> | Date | string | null
   course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
 }, "id">
 
@@ -244,6 +254,7 @@ export type PaymentOrderByWithAggregationInput = {
   payment_method?: Prisma.SortOrder
   fee?: Prisma.SortOrder
   courseId?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PaymentCountOrderByAggregateInput
   _avg?: Prisma.PaymentAvgOrderByAggregateInput
   _max?: Prisma.PaymentMaxOrderByAggregateInput
@@ -259,11 +270,13 @@ export type PaymentScalarWhereWithAggregatesInput = {
   payment_method?: Prisma.StringWithAggregatesFilter<"Payment"> | string
   fee?: Prisma.FloatWithAggregatesFilter<"Payment"> | number
   courseId?: Prisma.IntWithAggregatesFilter<"Payment"> | number
+  deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Payment"> | Date | string | null
 }
 
 export type PaymentCreateInput = {
   payment_method: string
   fee: number
+  deletedAt?: Date | string | null
   course: Prisma.CourseCreateNestedOneWithoutPaymentsInput
 }
 
@@ -272,11 +285,13 @@ export type PaymentUncheckedCreateInput = {
   payment_method: string
   fee: number
   courseId: number
+  deletedAt?: Date | string | null
 }
 
 export type PaymentUpdateInput = {
   payment_method?: Prisma.StringFieldUpdateOperationsInput | string
   fee?: Prisma.FloatFieldUpdateOperationsInput | number
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   course?: Prisma.CourseUpdateOneRequiredWithoutPaymentsNestedInput
 }
 
@@ -285,6 +300,7 @@ export type PaymentUncheckedUpdateInput = {
   payment_method?: Prisma.StringFieldUpdateOperationsInput | string
   fee?: Prisma.FloatFieldUpdateOperationsInput | number
   courseId?: Prisma.IntFieldUpdateOperationsInput | number
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PaymentCreateManyInput = {
@@ -292,11 +308,13 @@ export type PaymentCreateManyInput = {
   payment_method: string
   fee: number
   courseId: number
+  deletedAt?: Date | string | null
 }
 
 export type PaymentUpdateManyMutationInput = {
   payment_method?: Prisma.StringFieldUpdateOperationsInput | string
   fee?: Prisma.FloatFieldUpdateOperationsInput | number
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PaymentUncheckedUpdateManyInput = {
@@ -304,6 +322,7 @@ export type PaymentUncheckedUpdateManyInput = {
   payment_method?: Prisma.StringFieldUpdateOperationsInput | string
   fee?: Prisma.FloatFieldUpdateOperationsInput | number
   courseId?: Prisma.IntFieldUpdateOperationsInput | number
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PaymentListRelationFilter = {
@@ -327,6 +346,7 @@ export type PaymentCountOrderByAggregateInput = {
   payment_method?: Prisma.SortOrder
   fee?: Prisma.SortOrder
   courseId?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type PaymentAvgOrderByAggregateInput = {
@@ -340,6 +360,7 @@ export type PaymentMaxOrderByAggregateInput = {
   payment_method?: Prisma.SortOrder
   fee?: Prisma.SortOrder
   courseId?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type PaymentMinOrderByAggregateInput = {
@@ -347,6 +368,7 @@ export type PaymentMinOrderByAggregateInput = {
   payment_method?: Prisma.SortOrder
   fee?: Prisma.SortOrder
   courseId?: Prisma.SortOrder
+  deletedAt?: Prisma.SortOrder
 }
 
 export type PaymentSumOrderByAggregateInput = {
@@ -400,12 +422,14 @@ export type PaymentUncheckedUpdateManyWithoutCourseNestedInput = {
 export type PaymentCreateWithoutCourseInput = {
   payment_method: string
   fee: number
+  deletedAt?: Date | string | null
 }
 
 export type PaymentUncheckedCreateWithoutCourseInput = {
   id?: number
   payment_method: string
   fee: number
+  deletedAt?: Date | string | null
 }
 
 export type PaymentCreateOrConnectWithoutCourseInput = {
@@ -442,29 +466,34 @@ export type PaymentScalarWhereInput = {
   payment_method?: Prisma.StringFilter<"Payment"> | string
   fee?: Prisma.FloatFilter<"Payment"> | number
   courseId?: Prisma.IntFilter<"Payment"> | number
+  deletedAt?: Prisma.DateTimeNullableFilter<"Payment"> | Date | string | null
 }
 
 export type PaymentCreateManyCourseInput = {
   id?: number
   payment_method: string
   fee: number
+  deletedAt?: Date | string | null
 }
 
 export type PaymentUpdateWithoutCourseInput = {
   payment_method?: Prisma.StringFieldUpdateOperationsInput | string
   fee?: Prisma.FloatFieldUpdateOperationsInput | number
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PaymentUncheckedUpdateWithoutCourseInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   payment_method?: Prisma.StringFieldUpdateOperationsInput | string
   fee?: Prisma.FloatFieldUpdateOperationsInput | number
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 export type PaymentUncheckedUpdateManyWithoutCourseInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   payment_method?: Prisma.StringFieldUpdateOperationsInput | string
   fee?: Prisma.FloatFieldUpdateOperationsInput | number
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
 
@@ -474,6 +503,7 @@ export type PaymentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   payment_method?: boolean
   fee?: boolean
   courseId?: boolean
+  deletedAt?: boolean
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["payment"]>
 
@@ -484,9 +514,10 @@ export type PaymentSelectScalar = {
   payment_method?: boolean
   fee?: boolean
   courseId?: boolean
+  deletedAt?: boolean
 }
 
-export type PaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "payment_method" | "fee" | "courseId", ExtArgs["result"]["payment"]>
+export type PaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "payment_method" | "fee" | "courseId" | "deletedAt", ExtArgs["result"]["payment"]>
 export type PaymentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
 }
@@ -501,6 +532,7 @@ export type $PaymentPayload<ExtArgs extends runtime.Types.Extensions.InternalArg
     payment_method: string
     fee: number
     courseId: number
+    deletedAt: Date | null
   }, ExtArgs["result"]["payment"]>
   composites: {}
 }
@@ -875,6 +907,7 @@ export interface PaymentFieldRefs {
   readonly payment_method: Prisma.FieldRef<"Payment", 'String'>
   readonly fee: Prisma.FieldRef<"Payment", 'Float'>
   readonly courseId: Prisma.FieldRef<"Payment", 'Int'>
+  readonly deletedAt: Prisma.FieldRef<"Payment", 'DateTime'>
 }
     
 

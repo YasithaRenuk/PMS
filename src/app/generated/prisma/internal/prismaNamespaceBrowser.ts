@@ -80,7 +80,8 @@ export const BranchScalarFieldEnum = {
   branch_name: 'branch_name',
   show_id: 'show_id',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
 } as const
 
 export type BranchScalarFieldEnum = (typeof BranchScalarFieldEnum)[keyof typeof BranchScalarFieldEnum]
@@ -93,7 +94,8 @@ export const UserScalarFieldEnum = {
   role: 'role',
   branchId: 'branchId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -103,7 +105,8 @@ export const StudentScalarFieldEnum = {
   id: 'id',
   name: 'name',
   phone_number: 'phone_number',
-  student_id: 'student_id'
+  student_id: 'student_id',
+  deletedAt: 'deletedAt'
 } as const
 
 export type StudentScalarFieldEnum = (typeof StudentScalarFieldEnum)[keyof typeof StudentScalarFieldEnum]
@@ -112,7 +115,8 @@ export type StudentScalarFieldEnum = (typeof StudentScalarFieldEnum)[keyof typeo
 export const CourseScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  fee: 'fee'
+  fee: 'fee',
+  deletedAt: 'deletedAt'
 } as const
 
 export type CourseScalarFieldEnum = (typeof CourseScalarFieldEnum)[keyof typeof CourseScalarFieldEnum]
@@ -122,7 +126,8 @@ export const PaymentScalarFieldEnum = {
   id: 'id',
   payment_method: 'payment_method',
   fee: 'fee',
-  courseId: 'courseId'
+  courseId: 'courseId',
+  deletedAt: 'deletedAt'
 } as const
 
 export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum]
@@ -131,7 +136,8 @@ export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeo
 export const EnrollmentScalarFieldEnum = {
   studentId: 'studentId',
   courseId: 'courseId',
-  assignedAt: 'assignedAt'
+  assignedAt: 'assignedAt',
+  deletedAt: 'deletedAt'
 } as const
 
 export type EnrollmentScalarFieldEnum = (typeof EnrollmentScalarFieldEnum)[keyof typeof EnrollmentScalarFieldEnum]
@@ -145,20 +151,20 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
-export const BranchOrderByRelevanceFieldEnum = {
-  branch_name: 'branch_name',
-  show_id: 'show_id'
-} as const
-
-export type BranchOrderByRelevanceFieldEnum = (typeof BranchOrderByRelevanceFieldEnum)[keyof typeof BranchOrderByRelevanceFieldEnum]
-
-
 export const NullsOrder = {
   first: 'first',
   last: 'last'
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const BranchOrderByRelevanceFieldEnum = {
+  branch_name: 'branch_name',
+  show_id: 'show_id'
+} as const
+
+export type BranchOrderByRelevanceFieldEnum = (typeof BranchOrderByRelevanceFieldEnum)[keyof typeof BranchOrderByRelevanceFieldEnum]
 
 
 export const UserOrderByRelevanceFieldEnum = {

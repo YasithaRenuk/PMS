@@ -41,6 +41,20 @@ export default async function DashboardLayout({
                             </Link>
                         </>
                     )}
+
+                    <Link
+                        href="/dashboard/courses"
+                        className="flex items-center px-3 py-2 text-sm font-medium text-zinc-600 rounded-md hover:bg-zinc-50 hover:text-zinc-900 transition-colors"
+                    >
+                        Courses
+                    </Link>
+
+                    <Link
+                        href="/dashboard/students"
+                        className="flex items-center px-3 py-2 text-sm font-medium text-zinc-600 rounded-md hover:bg-zinc-50 hover:text-zinc-900 transition-colors"
+                    >
+                        Students
+                    </Link>
                     {/* Add other links for regular admins if needed later */}
                 </nav>
 
@@ -68,6 +82,6 @@ export default async function DashboardLayout({
                     {children}
                 </div>
             </main>
-        </div>
+        </div >
     );
 }

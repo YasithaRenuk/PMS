@@ -12,8 +12,9 @@ model Branch {
   branch_name String
   show_id     String
   users       User[]
+  students    Student[]
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAtz
+  updatedAt   DateTime @updatedAt
   deletedAt   DateTime?
 }
 
@@ -36,10 +37,12 @@ enum Role {
 
 model Student {
   id           Int          @id @default(autoincrement())
-  name         String
+  full_name    String       @unique
   phone_number String
   student_id   String
   enrollments  Enrollment[]
+  branchId     Int
+  branch       Branch       @relation(fields: [branchId], references: [id])
   deletedAt    DateTime?
 }
 

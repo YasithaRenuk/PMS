@@ -29,20 +29,25 @@ export type AggregatePayment = {
 export type PaymentAvgAggregateOutputType = {
   id: number | null
   fee: number | null
-  courseId: number | null
+  studentId: number | null
+  userId: number | null
 }
 
 export type PaymentSumAggregateOutputType = {
   id: number | null
   fee: number | null
-  courseId: number | null
+  studentId: number | null
+  userId: number | null
 }
 
 export type PaymentMinAggregateOutputType = {
   id: number | null
   payment_method: string | null
   fee: number | null
-  courseId: number | null
+  date: Date | null
+  time: string | null
+  studentId: number | null
+  userId: number | null
   deletedAt: Date | null
 }
 
@@ -50,7 +55,10 @@ export type PaymentMaxAggregateOutputType = {
   id: number | null
   payment_method: string | null
   fee: number | null
-  courseId: number | null
+  date: Date | null
+  time: string | null
+  studentId: number | null
+  userId: number | null
   deletedAt: Date | null
 }
 
@@ -58,7 +66,10 @@ export type PaymentCountAggregateOutputType = {
   id: number
   payment_method: number
   fee: number
-  courseId: number
+  date: number
+  time: number
+  studentId: number
+  userId: number
   deletedAt: number
   _all: number
 }
@@ -67,20 +78,25 @@ export type PaymentCountAggregateOutputType = {
 export type PaymentAvgAggregateInputType = {
   id?: true
   fee?: true
-  courseId?: true
+  studentId?: true
+  userId?: true
 }
 
 export type PaymentSumAggregateInputType = {
   id?: true
   fee?: true
-  courseId?: true
+  studentId?: true
+  userId?: true
 }
 
 export type PaymentMinAggregateInputType = {
   id?: true
   payment_method?: true
   fee?: true
-  courseId?: true
+  date?: true
+  time?: true
+  studentId?: true
+  userId?: true
   deletedAt?: true
 }
 
@@ -88,7 +104,10 @@ export type PaymentMaxAggregateInputType = {
   id?: true
   payment_method?: true
   fee?: true
-  courseId?: true
+  date?: true
+  time?: true
+  studentId?: true
+  userId?: true
   deletedAt?: true
 }
 
@@ -96,7 +115,10 @@ export type PaymentCountAggregateInputType = {
   id?: true
   payment_method?: true
   fee?: true
-  courseId?: true
+  date?: true
+  time?: true
+  studentId?: true
+  userId?: true
   deletedAt?: true
   _all?: true
 }
@@ -191,7 +213,10 @@ export type PaymentGroupByOutputType = {
   id: number
   payment_method: string
   fee: number
-  courseId: number
+  date: Date
+  time: string
+  studentId: number
+  userId: number
   deletedAt: Date | null
   _count: PaymentCountAggregateOutputType | null
   _avg: PaymentAvgAggregateOutputType | null
@@ -222,18 +247,26 @@ export type PaymentWhereInput = {
   id?: Prisma.IntFilter<"Payment"> | number
   payment_method?: Prisma.StringFilter<"Payment"> | string
   fee?: Prisma.FloatFilter<"Payment"> | number
-  courseId?: Prisma.IntFilter<"Payment"> | number
+  date?: Prisma.DateTimeFilter<"Payment"> | Date | string
+  time?: Prisma.StringFilter<"Payment"> | string
+  studentId?: Prisma.IntFilter<"Payment"> | number
+  userId?: Prisma.IntFilter<"Payment"> | number
   deletedAt?: Prisma.DateTimeNullableFilter<"Payment"> | Date | string | null
-  course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
+  student?: Prisma.XOR<Prisma.StudentScalarRelationFilter, Prisma.StudentWhereInput>
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
 export type PaymentOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   payment_method?: Prisma.SortOrder
   fee?: Prisma.SortOrder
-  courseId?: Prisma.SortOrder
+  date?: Prisma.SortOrder
+  time?: Prisma.SortOrder
+  studentId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
-  course?: Prisma.CourseOrderByWithRelationInput
+  student?: Prisma.StudentOrderByWithRelationInput
+  user?: Prisma.UserOrderByWithRelationInput
   _relevance?: Prisma.PaymentOrderByRelevanceInput
 }
 
@@ -244,16 +277,23 @@ export type PaymentWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.PaymentWhereInput | Prisma.PaymentWhereInput[]
   payment_method?: Prisma.StringFilter<"Payment"> | string
   fee?: Prisma.FloatFilter<"Payment"> | number
-  courseId?: Prisma.IntFilter<"Payment"> | number
+  date?: Prisma.DateTimeFilter<"Payment"> | Date | string
+  time?: Prisma.StringFilter<"Payment"> | string
+  studentId?: Prisma.IntFilter<"Payment"> | number
+  userId?: Prisma.IntFilter<"Payment"> | number
   deletedAt?: Prisma.DateTimeNullableFilter<"Payment"> | Date | string | null
-  course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
+  student?: Prisma.XOR<Prisma.StudentScalarRelationFilter, Prisma.StudentWhereInput>
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
 export type PaymentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   payment_method?: Prisma.SortOrder
   fee?: Prisma.SortOrder
-  courseId?: Prisma.SortOrder
+  date?: Prisma.SortOrder
+  time?: Prisma.SortOrder
+  studentId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.PaymentCountOrderByAggregateInput
   _avg?: Prisma.PaymentAvgOrderByAggregateInput
@@ -269,37 +309,52 @@ export type PaymentScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"Payment"> | number
   payment_method?: Prisma.StringWithAggregatesFilter<"Payment"> | string
   fee?: Prisma.FloatWithAggregatesFilter<"Payment"> | number
-  courseId?: Prisma.IntWithAggregatesFilter<"Payment"> | number
+  date?: Prisma.DateTimeWithAggregatesFilter<"Payment"> | Date | string
+  time?: Prisma.StringWithAggregatesFilter<"Payment"> | string
+  studentId?: Prisma.IntWithAggregatesFilter<"Payment"> | number
+  userId?: Prisma.IntWithAggregatesFilter<"Payment"> | number
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Payment"> | Date | string | null
 }
 
 export type PaymentCreateInput = {
   payment_method: string
   fee: number
+  date?: Date | string
+  time: string
   deletedAt?: Date | string | null
-  course: Prisma.CourseCreateNestedOneWithoutPaymentsInput
+  student: Prisma.StudentCreateNestedOneWithoutPaymentsInput
+  user: Prisma.UserCreateNestedOneWithoutPaymentsInput
 }
 
 export type PaymentUncheckedCreateInput = {
   id?: number
   payment_method: string
   fee: number
-  courseId: number
+  date?: Date | string
+  time: string
+  studentId: number
+  userId: number
   deletedAt?: Date | string | null
 }
 
 export type PaymentUpdateInput = {
   payment_method?: Prisma.StringFieldUpdateOperationsInput | string
   fee?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-  course?: Prisma.CourseUpdateOneRequiredWithoutPaymentsNestedInput
+  student?: Prisma.StudentUpdateOneRequiredWithoutPaymentsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutPaymentsNestedInput
 }
 
 export type PaymentUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   payment_method?: Prisma.StringFieldUpdateOperationsInput | string
   fee?: Prisma.FloatFieldUpdateOperationsInput | number
-  courseId?: Prisma.IntFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  studentId?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -307,13 +362,18 @@ export type PaymentCreateManyInput = {
   id?: number
   payment_method: string
   fee: number
-  courseId: number
+  date?: Date | string
+  time: string
+  studentId: number
+  userId: number
   deletedAt?: Date | string | null
 }
 
 export type PaymentUpdateManyMutationInput = {
   payment_method?: Prisma.StringFieldUpdateOperationsInput | string
   fee?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -321,7 +381,10 @@ export type PaymentUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   payment_method?: Prisma.StringFieldUpdateOperationsInput | string
   fee?: Prisma.FloatFieldUpdateOperationsInput | number
-  courseId?: Prisma.IntFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  studentId?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -345,21 +408,28 @@ export type PaymentCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   payment_method?: Prisma.SortOrder
   fee?: Prisma.SortOrder
-  courseId?: Prisma.SortOrder
+  date?: Prisma.SortOrder
+  time?: Prisma.SortOrder
+  studentId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
 }
 
 export type PaymentAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
   fee?: Prisma.SortOrder
-  courseId?: Prisma.SortOrder
+  studentId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
 }
 
 export type PaymentMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   payment_method?: Prisma.SortOrder
   fee?: Prisma.SortOrder
-  courseId?: Prisma.SortOrder
+  date?: Prisma.SortOrder
+  time?: Prisma.SortOrder
+  studentId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
 }
 
@@ -367,95 +437,147 @@ export type PaymentMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   payment_method?: Prisma.SortOrder
   fee?: Prisma.SortOrder
-  courseId?: Prisma.SortOrder
+  date?: Prisma.SortOrder
+  time?: Prisma.SortOrder
+  studentId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
 }
 
 export type PaymentSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   fee?: Prisma.SortOrder
-  courseId?: Prisma.SortOrder
+  studentId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
 }
 
-export type PaymentCreateNestedManyWithoutCourseInput = {
-  create?: Prisma.XOR<Prisma.PaymentCreateWithoutCourseInput, Prisma.PaymentUncheckedCreateWithoutCourseInput> | Prisma.PaymentCreateWithoutCourseInput[] | Prisma.PaymentUncheckedCreateWithoutCourseInput[]
-  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutCourseInput | Prisma.PaymentCreateOrConnectWithoutCourseInput[]
-  createMany?: Prisma.PaymentCreateManyCourseInputEnvelope
+export type PaymentCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutUserInput, Prisma.PaymentUncheckedCreateWithoutUserInput> | Prisma.PaymentCreateWithoutUserInput[] | Prisma.PaymentUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutUserInput | Prisma.PaymentCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.PaymentCreateManyUserInputEnvelope
   connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
 }
 
-export type PaymentUncheckedCreateNestedManyWithoutCourseInput = {
-  create?: Prisma.XOR<Prisma.PaymentCreateWithoutCourseInput, Prisma.PaymentUncheckedCreateWithoutCourseInput> | Prisma.PaymentCreateWithoutCourseInput[] | Prisma.PaymentUncheckedCreateWithoutCourseInput[]
-  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutCourseInput | Prisma.PaymentCreateOrConnectWithoutCourseInput[]
-  createMany?: Prisma.PaymentCreateManyCourseInputEnvelope
+export type PaymentUncheckedCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutUserInput, Prisma.PaymentUncheckedCreateWithoutUserInput> | Prisma.PaymentCreateWithoutUserInput[] | Prisma.PaymentUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutUserInput | Prisma.PaymentCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.PaymentCreateManyUserInputEnvelope
   connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
 }
 
-export type PaymentUpdateManyWithoutCourseNestedInput = {
-  create?: Prisma.XOR<Prisma.PaymentCreateWithoutCourseInput, Prisma.PaymentUncheckedCreateWithoutCourseInput> | Prisma.PaymentCreateWithoutCourseInput[] | Prisma.PaymentUncheckedCreateWithoutCourseInput[]
-  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutCourseInput | Prisma.PaymentCreateOrConnectWithoutCourseInput[]
-  upsert?: Prisma.PaymentUpsertWithWhereUniqueWithoutCourseInput | Prisma.PaymentUpsertWithWhereUniqueWithoutCourseInput[]
-  createMany?: Prisma.PaymentCreateManyCourseInputEnvelope
+export type PaymentUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutUserInput, Prisma.PaymentUncheckedCreateWithoutUserInput> | Prisma.PaymentCreateWithoutUserInput[] | Prisma.PaymentUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutUserInput | Prisma.PaymentCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.PaymentUpsertWithWhereUniqueWithoutUserInput | Prisma.PaymentUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.PaymentCreateManyUserInputEnvelope
   set?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
   disconnect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
   delete?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
   connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
-  update?: Prisma.PaymentUpdateWithWhereUniqueWithoutCourseInput | Prisma.PaymentUpdateWithWhereUniqueWithoutCourseInput[]
-  updateMany?: Prisma.PaymentUpdateManyWithWhereWithoutCourseInput | Prisma.PaymentUpdateManyWithWhereWithoutCourseInput[]
+  update?: Prisma.PaymentUpdateWithWhereUniqueWithoutUserInput | Prisma.PaymentUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.PaymentUpdateManyWithWhereWithoutUserInput | Prisma.PaymentUpdateManyWithWhereWithoutUserInput[]
   deleteMany?: Prisma.PaymentScalarWhereInput | Prisma.PaymentScalarWhereInput[]
 }
 
-export type PaymentUncheckedUpdateManyWithoutCourseNestedInput = {
-  create?: Prisma.XOR<Prisma.PaymentCreateWithoutCourseInput, Prisma.PaymentUncheckedCreateWithoutCourseInput> | Prisma.PaymentCreateWithoutCourseInput[] | Prisma.PaymentUncheckedCreateWithoutCourseInput[]
-  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutCourseInput | Prisma.PaymentCreateOrConnectWithoutCourseInput[]
-  upsert?: Prisma.PaymentUpsertWithWhereUniqueWithoutCourseInput | Prisma.PaymentUpsertWithWhereUniqueWithoutCourseInput[]
-  createMany?: Prisma.PaymentCreateManyCourseInputEnvelope
+export type PaymentUncheckedUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutUserInput, Prisma.PaymentUncheckedCreateWithoutUserInput> | Prisma.PaymentCreateWithoutUserInput[] | Prisma.PaymentUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutUserInput | Prisma.PaymentCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.PaymentUpsertWithWhereUniqueWithoutUserInput | Prisma.PaymentUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.PaymentCreateManyUserInputEnvelope
   set?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
   disconnect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
   delete?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
   connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
-  update?: Prisma.PaymentUpdateWithWhereUniqueWithoutCourseInput | Prisma.PaymentUpdateWithWhereUniqueWithoutCourseInput[]
-  updateMany?: Prisma.PaymentUpdateManyWithWhereWithoutCourseInput | Prisma.PaymentUpdateManyWithWhereWithoutCourseInput[]
+  update?: Prisma.PaymentUpdateWithWhereUniqueWithoutUserInput | Prisma.PaymentUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.PaymentUpdateManyWithWhereWithoutUserInput | Prisma.PaymentUpdateManyWithWhereWithoutUserInput[]
   deleteMany?: Prisma.PaymentScalarWhereInput | Prisma.PaymentScalarWhereInput[]
 }
 
-export type PaymentCreateWithoutCourseInput = {
+export type PaymentCreateNestedManyWithoutStudentInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutStudentInput, Prisma.PaymentUncheckedCreateWithoutStudentInput> | Prisma.PaymentCreateWithoutStudentInput[] | Prisma.PaymentUncheckedCreateWithoutStudentInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutStudentInput | Prisma.PaymentCreateOrConnectWithoutStudentInput[]
+  createMany?: Prisma.PaymentCreateManyStudentInputEnvelope
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+}
+
+export type PaymentUncheckedCreateNestedManyWithoutStudentInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutStudentInput, Prisma.PaymentUncheckedCreateWithoutStudentInput> | Prisma.PaymentCreateWithoutStudentInput[] | Prisma.PaymentUncheckedCreateWithoutStudentInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutStudentInput | Prisma.PaymentCreateOrConnectWithoutStudentInput[]
+  createMany?: Prisma.PaymentCreateManyStudentInputEnvelope
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+}
+
+export type PaymentUpdateManyWithoutStudentNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutStudentInput, Prisma.PaymentUncheckedCreateWithoutStudentInput> | Prisma.PaymentCreateWithoutStudentInput[] | Prisma.PaymentUncheckedCreateWithoutStudentInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutStudentInput | Prisma.PaymentCreateOrConnectWithoutStudentInput[]
+  upsert?: Prisma.PaymentUpsertWithWhereUniqueWithoutStudentInput | Prisma.PaymentUpsertWithWhereUniqueWithoutStudentInput[]
+  createMany?: Prisma.PaymentCreateManyStudentInputEnvelope
+  set?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  disconnect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  delete?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  update?: Prisma.PaymentUpdateWithWhereUniqueWithoutStudentInput | Prisma.PaymentUpdateWithWhereUniqueWithoutStudentInput[]
+  updateMany?: Prisma.PaymentUpdateManyWithWhereWithoutStudentInput | Prisma.PaymentUpdateManyWithWhereWithoutStudentInput[]
+  deleteMany?: Prisma.PaymentScalarWhereInput | Prisma.PaymentScalarWhereInput[]
+}
+
+export type PaymentUncheckedUpdateManyWithoutStudentNestedInput = {
+  create?: Prisma.XOR<Prisma.PaymentCreateWithoutStudentInput, Prisma.PaymentUncheckedCreateWithoutStudentInput> | Prisma.PaymentCreateWithoutStudentInput[] | Prisma.PaymentUncheckedCreateWithoutStudentInput[]
+  connectOrCreate?: Prisma.PaymentCreateOrConnectWithoutStudentInput | Prisma.PaymentCreateOrConnectWithoutStudentInput[]
+  upsert?: Prisma.PaymentUpsertWithWhereUniqueWithoutStudentInput | Prisma.PaymentUpsertWithWhereUniqueWithoutStudentInput[]
+  createMany?: Prisma.PaymentCreateManyStudentInputEnvelope
+  set?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  disconnect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  delete?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  connect?: Prisma.PaymentWhereUniqueInput | Prisma.PaymentWhereUniqueInput[]
+  update?: Prisma.PaymentUpdateWithWhereUniqueWithoutStudentInput | Prisma.PaymentUpdateWithWhereUniqueWithoutStudentInput[]
+  updateMany?: Prisma.PaymentUpdateManyWithWhereWithoutStudentInput | Prisma.PaymentUpdateManyWithWhereWithoutStudentInput[]
+  deleteMany?: Prisma.PaymentScalarWhereInput | Prisma.PaymentScalarWhereInput[]
+}
+
+export type PaymentCreateWithoutUserInput = {
   payment_method: string
   fee: number
+  date?: Date | string
+  time: string
   deletedAt?: Date | string | null
+  student: Prisma.StudentCreateNestedOneWithoutPaymentsInput
 }
 
-export type PaymentUncheckedCreateWithoutCourseInput = {
+export type PaymentUncheckedCreateWithoutUserInput = {
   id?: number
   payment_method: string
   fee: number
+  date?: Date | string
+  time: string
+  studentId: number
   deletedAt?: Date | string | null
 }
 
-export type PaymentCreateOrConnectWithoutCourseInput = {
+export type PaymentCreateOrConnectWithoutUserInput = {
   where: Prisma.PaymentWhereUniqueInput
-  create: Prisma.XOR<Prisma.PaymentCreateWithoutCourseInput, Prisma.PaymentUncheckedCreateWithoutCourseInput>
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutUserInput, Prisma.PaymentUncheckedCreateWithoutUserInput>
 }
 
-export type PaymentCreateManyCourseInputEnvelope = {
-  data: Prisma.PaymentCreateManyCourseInput | Prisma.PaymentCreateManyCourseInput[]
+export type PaymentCreateManyUserInputEnvelope = {
+  data: Prisma.PaymentCreateManyUserInput | Prisma.PaymentCreateManyUserInput[]
   skipDuplicates?: boolean
 }
 
-export type PaymentUpsertWithWhereUniqueWithoutCourseInput = {
+export type PaymentUpsertWithWhereUniqueWithoutUserInput = {
   where: Prisma.PaymentWhereUniqueInput
-  update: Prisma.XOR<Prisma.PaymentUpdateWithoutCourseInput, Prisma.PaymentUncheckedUpdateWithoutCourseInput>
-  create: Prisma.XOR<Prisma.PaymentCreateWithoutCourseInput, Prisma.PaymentUncheckedCreateWithoutCourseInput>
+  update: Prisma.XOR<Prisma.PaymentUpdateWithoutUserInput, Prisma.PaymentUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutUserInput, Prisma.PaymentUncheckedCreateWithoutUserInput>
 }
 
-export type PaymentUpdateWithWhereUniqueWithoutCourseInput = {
+export type PaymentUpdateWithWhereUniqueWithoutUserInput = {
   where: Prisma.PaymentWhereUniqueInput
-  data: Prisma.XOR<Prisma.PaymentUpdateWithoutCourseInput, Prisma.PaymentUncheckedUpdateWithoutCourseInput>
+  data: Prisma.XOR<Prisma.PaymentUpdateWithoutUserInput, Prisma.PaymentUncheckedUpdateWithoutUserInput>
 }
 
-export type PaymentUpdateManyWithWhereWithoutCourseInput = {
+export type PaymentUpdateManyWithWhereWithoutUserInput = {
   where: Prisma.PaymentScalarWhereInput
-  data: Prisma.XOR<Prisma.PaymentUpdateManyMutationInput, Prisma.PaymentUncheckedUpdateManyWithoutCourseInput>
+  data: Prisma.XOR<Prisma.PaymentUpdateManyMutationInput, Prisma.PaymentUncheckedUpdateManyWithoutUserInput>
 }
 
 export type PaymentScalarWhereInput = {
@@ -465,34 +587,133 @@ export type PaymentScalarWhereInput = {
   id?: Prisma.IntFilter<"Payment"> | number
   payment_method?: Prisma.StringFilter<"Payment"> | string
   fee?: Prisma.FloatFilter<"Payment"> | number
-  courseId?: Prisma.IntFilter<"Payment"> | number
+  date?: Prisma.DateTimeFilter<"Payment"> | Date | string
+  time?: Prisma.StringFilter<"Payment"> | string
+  studentId?: Prisma.IntFilter<"Payment"> | number
+  userId?: Prisma.IntFilter<"Payment"> | number
   deletedAt?: Prisma.DateTimeNullableFilter<"Payment"> | Date | string | null
 }
 
-export type PaymentCreateManyCourseInput = {
+export type PaymentCreateWithoutStudentInput = {
+  payment_method: string
+  fee: number
+  date?: Date | string
+  time: string
+  deletedAt?: Date | string | null
+  user: Prisma.UserCreateNestedOneWithoutPaymentsInput
+}
+
+export type PaymentUncheckedCreateWithoutStudentInput = {
   id?: number
   payment_method: string
   fee: number
+  date?: Date | string
+  time: string
+  userId: number
   deletedAt?: Date | string | null
 }
 
-export type PaymentUpdateWithoutCourseInput = {
-  payment_method?: Prisma.StringFieldUpdateOperationsInput | string
-  fee?: Prisma.FloatFieldUpdateOperationsInput | number
-  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+export type PaymentCreateOrConnectWithoutStudentInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutStudentInput, Prisma.PaymentUncheckedCreateWithoutStudentInput>
 }
 
-export type PaymentUncheckedUpdateWithoutCourseInput = {
+export type PaymentCreateManyStudentInputEnvelope = {
+  data: Prisma.PaymentCreateManyStudentInput | Prisma.PaymentCreateManyStudentInput[]
+  skipDuplicates?: boolean
+}
+
+export type PaymentUpsertWithWhereUniqueWithoutStudentInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  update: Prisma.XOR<Prisma.PaymentUpdateWithoutStudentInput, Prisma.PaymentUncheckedUpdateWithoutStudentInput>
+  create: Prisma.XOR<Prisma.PaymentCreateWithoutStudentInput, Prisma.PaymentUncheckedCreateWithoutStudentInput>
+}
+
+export type PaymentUpdateWithWhereUniqueWithoutStudentInput = {
+  where: Prisma.PaymentWhereUniqueInput
+  data: Prisma.XOR<Prisma.PaymentUpdateWithoutStudentInput, Prisma.PaymentUncheckedUpdateWithoutStudentInput>
+}
+
+export type PaymentUpdateManyWithWhereWithoutStudentInput = {
+  where: Prisma.PaymentScalarWhereInput
+  data: Prisma.XOR<Prisma.PaymentUpdateManyMutationInput, Prisma.PaymentUncheckedUpdateManyWithoutStudentInput>
+}
+
+export type PaymentCreateManyUserInput = {
+  id?: number
+  payment_method: string
+  fee: number
+  date?: Date | string
+  time: string
+  studentId: number
+  deletedAt?: Date | string | null
+}
+
+export type PaymentUpdateWithoutUserInput = {
+  payment_method?: Prisma.StringFieldUpdateOperationsInput | string
+  fee?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  student?: Prisma.StudentUpdateOneRequiredWithoutPaymentsNestedInput
+}
+
+export type PaymentUncheckedUpdateWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   payment_method?: Prisma.StringFieldUpdateOperationsInput | string
   fee?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  studentId?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
-export type PaymentUncheckedUpdateManyWithoutCourseInput = {
+export type PaymentUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   payment_method?: Prisma.StringFieldUpdateOperationsInput | string
   fee?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  studentId?: Prisma.IntFieldUpdateOperationsInput | number
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type PaymentCreateManyStudentInput = {
+  id?: number
+  payment_method: string
+  fee: number
+  date?: Date | string
+  time: string
+  userId: number
+  deletedAt?: Date | string | null
+}
+
+export type PaymentUpdateWithoutStudentInput = {
+  payment_method?: Prisma.StringFieldUpdateOperationsInput | string
+  fee?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  user?: Prisma.UserUpdateOneRequiredWithoutPaymentsNestedInput
+}
+
+export type PaymentUncheckedUpdateWithoutStudentInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  payment_method?: Prisma.StringFieldUpdateOperationsInput | string
+  fee?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type PaymentUncheckedUpdateManyWithoutStudentInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  payment_method?: Prisma.StringFieldUpdateOperationsInput | string
+  fee?: Prisma.FloatFieldUpdateOperationsInput | number
+  date?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  time?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
 }
 
@@ -502,9 +723,13 @@ export type PaymentSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   id?: boolean
   payment_method?: boolean
   fee?: boolean
-  courseId?: boolean
+  date?: boolean
+  time?: boolean
+  studentId?: boolean
+  userId?: boolean
   deletedAt?: boolean
-  course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
+  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["payment"]>
 
 
@@ -513,25 +738,33 @@ export type PaymentSelectScalar = {
   id?: boolean
   payment_method?: boolean
   fee?: boolean
-  courseId?: boolean
+  date?: boolean
+  time?: boolean
+  studentId?: boolean
+  userId?: boolean
   deletedAt?: boolean
 }
 
-export type PaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "payment_method" | "fee" | "courseId" | "deletedAt", ExtArgs["result"]["payment"]>
+export type PaymentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "payment_method" | "fee" | "date" | "time" | "studentId" | "userId" | "deletedAt", ExtArgs["result"]["payment"]>
 export type PaymentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
+  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
 
 export type $PaymentPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Payment"
   objects: {
-    course: Prisma.$CoursePayload<ExtArgs>
+    student: Prisma.$StudentPayload<ExtArgs>
+    user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     payment_method: string
     fee: number
-    courseId: number
+    date: Date
+    time: string
+    studentId: number
+    userId: number
     deletedAt: Date | null
   }, ExtArgs["result"]["payment"]>
   composites: {}
@@ -873,7 +1106,8 @@ readonly fields: PaymentFieldRefs;
  */
 export interface Prisma__PaymentClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  course<T extends Prisma.CourseDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CourseDefaultArgs<ExtArgs>>): Prisma.Prisma__CourseClient<runtime.Types.Result.GetResult<Prisma.$CoursePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  student<T extends Prisma.StudentDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StudentDefaultArgs<ExtArgs>>): Prisma.Prisma__StudentClient<runtime.Types.Result.GetResult<Prisma.$StudentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -906,7 +1140,10 @@ export interface PaymentFieldRefs {
   readonly id: Prisma.FieldRef<"Payment", 'Int'>
   readonly payment_method: Prisma.FieldRef<"Payment", 'String'>
   readonly fee: Prisma.FieldRef<"Payment", 'Float'>
-  readonly courseId: Prisma.FieldRef<"Payment", 'Int'>
+  readonly date: Prisma.FieldRef<"Payment", 'DateTime'>
+  readonly time: Prisma.FieldRef<"Payment", 'String'>
+  readonly studentId: Prisma.FieldRef<"Payment", 'Int'>
+  readonly userId: Prisma.FieldRef<"Payment", 'Int'>
   readonly deletedAt: Prisma.FieldRef<"Payment", 'DateTime'>
 }
     

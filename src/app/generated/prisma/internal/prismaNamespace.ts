@@ -896,7 +896,10 @@ export const PaymentScalarFieldEnum = {
   id: 'id',
   payment_method: 'payment_method',
   fee: 'fee',
-  courseId: 'courseId',
+  date: 'date',
+  time: 'time',
+  studentId: 'studentId',
+  userId: 'userId',
   deletedAt: 'deletedAt'
 } as const
 
@@ -962,7 +965,8 @@ export type CourseOrderByRelevanceFieldEnum = (typeof CourseOrderByRelevanceFiel
 
 
 export const PaymentOrderByRelevanceFieldEnum = {
-  payment_method: 'payment_method'
+  payment_method: 'payment_method',
+  time: 'time'
 } as const
 
 export type PaymentOrderByRelevanceFieldEnum = (typeof PaymentOrderByRelevanceFieldEnum)[keyof typeof PaymentOrderByRelevanceFieldEnum]

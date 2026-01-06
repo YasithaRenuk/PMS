@@ -25,6 +25,7 @@ model User {
   role      Role     @default(admin)
   branchId  Int?
   branch    Branch?  @relation(fields: [branchId], references: [id])
+  payments  Payment[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
@@ -41,6 +42,7 @@ model Student {
   phone_number String
   student_id   String
   enrollments  Enrollment[]
+  payments     Payment[]
   branchId     Int
   branch       Branch       @relation(fields: [branchId], references: [id])
   deletedAt    DateTime?
@@ -50,17 +52,20 @@ model Course {
   id          Int          @id @default(autoincrement())
   name        String
   fee         Float
-  payments    Payment[]
   enrollments Enrollment[]
   deletedAt   DateTime?
 }
 
 model Payment {
-  id             Int    @id @default(autoincrement())
+  id             Int       @id @default(autoincrement())
   payment_method String
   fee            Float
-  courseId       Int
-  course         Course @relation(fields: [courseId], references: [id])
+  date           DateTime  @default(now())
+  time           String
+  studentId      Int
+  student        Student   @relation(fields: [studentId], references: [id])
+  userId         Int
+  user           User      @relation(fields: [userId], references: [id])
   deletedAt      DateTime?
 }
 

@@ -15,10 +15,12 @@ export default async function StudentsPage(props: {
 
     const branchIdParam = searchParams.branchId;
     const courseIdParam = searchParams.courseId;
+    const searchParam = searchParams.query;
 
     const filter = {
         branchId: branchIdParam && branchIdParam !== "all" ? parseInt(branchIdParam as string) : undefined,
         courseId: courseIdParam && courseIdParam !== "all" ? parseInt(courseIdParam as string) : undefined,
+        query: searchParam as string | undefined,
     };
 
     const { data: students, success } = await getStudents(filter);

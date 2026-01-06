@@ -131,42 +131,45 @@ export function StudentList({ students, branches, courses, userRole }: StudentLi
                     <Input
                         type="search"
                         placeholder="Search by Name, ID, or Phone..."
-                        className="pl-8"
+                        className="pl-8 w-full"
                         value={query}
                         onChange={(e) => handleSearch(e.target.value)}
                     />
                 </div>
-                {isSuperAdmin && (
-                    <div className="w-[200px]">
-                        <Select value={selectedBranchId} onValueChange={(v) => handleFilterChange("branchId", v)}>
+                <div className="flex flex-col md:flex-row gap-4">
+                    {isSuperAdmin && (
+                        <div className="w-full md:w-[200px]">
+                            <Select value={selectedBranchId} onValueChange={(v) => handleFilterChange("branchId", v)}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="All Branches" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Branches</SelectItem>
+                                    {branches.map(b => (
+                                        <SelectItem key={b.id} value={b.id.toString()}>{b.branch_name}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
+                    <div className="w-full md:w-[200px]">
+                        <Select value={selectedCourseId} onValueChange={(v) => handleFilterChange("courseId", v)}>
                             <SelectTrigger>
-                                <SelectValue placeholder="All Branches" />
+                                <SelectValue placeholder="All Courses" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="all">All Branches</SelectItem>
-                                {branches.map(b => (
-                                    <SelectItem key={b.id} value={b.id.toString()}>{b.branch_name}</SelectItem>
+                                <SelectItem value="all">All Courses</SelectItem>
+                                {courses.map(c => (
+                                    <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
                     </div>
-                )}
-                <div className="w-[200px]">
-                    <Select value={selectedCourseId} onValueChange={(v) => handleFilterChange("courseId", v)}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="All Courses" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Courses</SelectItem>
-                            {courses.map(c => (
-                                <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
                 </div>
             </div>
 
-            <div className="rounded-md border">
+            {/* Desktop Table */}
+            <div className="hidden md:block rounded-md border">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -240,6 +243,86 @@ export function StudentList({ students, branches, courses, userRole }: StudentLi
                         )}
                     </TableBody>
                 </Table>
+            </div>
+
+            {/* Mobile List (Cards) */}
+            <div className="grid grid-cols-1 gap-4 md:hidden">
+                {students.map((student) => (
+                    <div key={student.id} className="p-4 border rounded-lg space-y-3 bg-card shadow-sm">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <h3 className="font-bold text-lg">{student.full_name}</h3>
+                                <p className="text-sm text-muted-foreground">{student.student_id}</p>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                <PaymentDialog
+                                    studentId={student.id}
+                                    studentName={student.full_name}
+                                    trigger={
+                                        <Button variant="outline" size="icon" className="h-8 w-8">
+                                            <DollarSign className="h-4 w-4" />
+                                        </Button>
+                                    }
+                                    onSuccess={() => router.refresh()}
+                                />
+                                <PaymentRecordsDialog
+                                    studentId={student.id}
+                                    studentName={student.full_name}
+                                    trigger={
+                                        <Button variant="outline" size="icon" className="h-8 w-8">
+                                            <Eye className="h-4 w-4" />
+                                        </Button>
+                                    }
+                                />
+                                <StudentDialog
+                                    student={student}
+                                    courses={courses}
+                                    branches={branches}
+                                    userRole={userRole}
+                                    trigger={
+                                        <Button variant="outline" size="icon" className="h-8 w-8">
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                    }
+                                    onSuccess={() => router.refresh()}
+                                />
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-8 w-8 text-red-500 hover:text-red-600"
+                                    onClick={() => handleDelete(student.id)}
+                                >
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div>
+                                <p className="text-muted-foreground font-medium">Phone</p>
+                                <p>{student.phone_number}</p>
+                            </div>
+                            <div>
+                                <p className="text-muted-foreground font-medium">Branch</p>
+                                <p>{student.branch.branch_name}</p>
+                            </div>
+                            <div className="col-span-2">
+                                <p className="text-muted-foreground font-medium">Courses</p>
+                                <p className="flex flex-wrap gap-1">
+                                    {student.enrollments.map(e => (
+                                        <span key={e.courseId} className="bg-secondary px-2 py-0.5 rounded-full text-[10px]">
+                                            {e.course.name}
+                                        </span>
+                                    ))}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+                {students.length === 0 && (
+                    <div className="p-8 text-center border rounded-lg text-muted-foreground">
+                        No students found.
+                    </div>
+                )}
             </div>
         </div>
     );

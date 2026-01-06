@@ -27,6 +27,8 @@ export default async function ReportsPage(props: {
 
     const branchIdParam = getSingleParam(searchParams.branchId);
     const courseIdParam = getSingleParam(searchParams.courseId);
+    const startDateParam = getSingleParam(searchParams.startDate);
+    const endDateParam = getSingleParam(searchParams.endDate);
 
     console.log("--- ReportsPage Server Render ---");
     console.log("Query Params:", { branchIdParam, courseIdParam });
@@ -34,6 +36,8 @@ export default async function ReportsPage(props: {
     const filters = {
         branchId: branchIdParam && branchIdParam !== "all" && !isNaN(parseInt(branchIdParam)) ? parseInt(branchIdParam) : undefined,
         courseId: courseIdParam && courseIdParam !== "all" && !isNaN(parseInt(courseIdParam)) ? parseInt(courseIdParam) : undefined,
+        startDate: startDateParam || undefined,
+        endDate: endDateParam || undefined,
     };
 
     console.log("Constructed Filters:", filters);

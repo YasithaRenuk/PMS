@@ -199,7 +199,12 @@ export async function getStudentPayments(studentId: number) {
   }
 }
 
-export async function getPaymentReports(filters?: { branchId?: number; courseId?: number }) {
+export async function getPaymentReports(filters?: { 
+  branchId?: number; 
+  courseId?: number;
+  startDate?: string;
+  endDate?: string;
+}) {
   try {
     const session = await getServerAuthSession();
     if (!session || session.user.role !== Role.superAdmin) {
@@ -207,6 +212,19 @@ export async function getPaymentReports(filters?: { branchId?: number; courseId?
     }
 
     const where: any = { deletedAt: null };
+
+    if (filters?.startDate || filters?.endDate) {
+      where.date = {};
+      if (filters.startDate) {
+        where.date.gte = new Date(filters.startDate);
+      }
+      if (filters.endDate) {
+        // To include the entire end date, we set it to the end of the day
+        const endDay = new Date(filters.endDate);
+        endDay.setHours(23, 59, 59, 999);
+        where.date.lte = endDay;
+      }
+    }
     
     // Add student filter ensuring students are not deleted
     const studentFilter: any = { deletedAt: null };

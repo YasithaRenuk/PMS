@@ -8,6 +8,7 @@ interface ReportFiltersProps {
     courses: { id: number; name: string }[];
 }
 
+import { Input } from "@/components/ui/input";
 import { Suspense } from "react";
 
 export function ReportFilters(props: ReportFiltersProps) {
@@ -24,6 +25,8 @@ function FilterContent({ branches, courses }: ReportFiltersProps) {
 
     const selectedBranchId = searchParams.get("branchId") || "all";
     const selectedCourseId = searchParams.get("courseId") || "all";
+    const selectedStartDate = searchParams.get("startDate") || "";
+    const selectedEndDate = searchParams.get("endDate") || "";
 
     function handleFilterChange(key: string, value: string) {
         console.log(`Filter change: ${key} = ${value}`);
@@ -40,8 +43,8 @@ function FilterContent({ branches, courses }: ReportFiltersProps) {
     }
 
     return (
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
-            <div className="w-full md:w-[250px]">
+        <div className="flex flex-col md:flex-row flex-wrap gap-4 mb-8">
+            <div className="w-full md:w-[200px]">
                 <label className="text-sm font-medium text-zinc-700 mb-1.5 block">Branch Filter</label>
                 <Select value={selectedBranchId} onValueChange={(v) => handleFilterChange("branchId", v)}>
                     <SelectTrigger className="bg-white">
@@ -56,7 +59,7 @@ function FilterContent({ branches, courses }: ReportFiltersProps) {
                 </Select>
             </div>
 
-            <div className="w-full md:w-[250px]">
+            <div className="w-full md:w-[200px]">
                 <label className="text-sm font-medium text-zinc-700 mb-1.5 block">Course Filter</label>
                 <Select value={selectedCourseId} onValueChange={(v) => handleFilterChange("courseId", v)}>
                     <SelectTrigger className="bg-white">
@@ -69,6 +72,26 @@ function FilterContent({ branches, courses }: ReportFiltersProps) {
                         ))}
                     </SelectContent>
                 </Select>
+            </div>
+
+            <div className="w-full md:w-[200px]">
+                <label className="text-sm font-medium text-zinc-700 mb-1.5 block">Start Date</label>
+                <Input
+                    type="date"
+                    value={selectedStartDate}
+                    onChange={(e) => handleFilterChange("startDate", e.target.value)}
+                    className="bg-white"
+                />
+            </div>
+
+            <div className="w-full md:w-[200px]">
+                <label className="text-sm font-medium text-zinc-700 mb-1.5 block">End Date</label>
+                <Input
+                    type="date"
+                    value={selectedEndDate}
+                    onChange={(e) => handleFilterChange("endDate", e.target.value)}
+                    className="bg-white"
+                />
             </div>
         </div>
     );

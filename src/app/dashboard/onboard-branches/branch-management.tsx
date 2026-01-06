@@ -97,13 +97,14 @@ export function BranchManagement({ initialBranches }: { initialBranches: Branch[
     return (
         <>
             <div className="flex justify-end mb-6">
-                <Button onClick={handleOpenCreate}>
+                <Button onClick={handleOpenCreate} className="w-full md:w-auto">
                     <Plus className="mr-2 h-4 w-4" />
                     Add New Branch
                 </Button>
             </div>
 
-            <div className="rounded-md border">
+            {/* Desktop Table */}
+            <div className="hidden md:block rounded-md border">
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -158,6 +159,56 @@ export function BranchManagement({ initialBranches }: { initialBranches: Branch[
                         )}
                     </TableBody>
                 </Table>
+            </div>
+
+            {/* Mobile Card Layout */}
+            <div className="grid grid-cols-1 gap-4 md:hidden">
+                {initialBranches.map((branch) => (
+                    <div key={branch.id} className="p-4 border rounded-lg space-y-3 bg-card shadow-sm">
+                        <div className="flex justify-between items-start">
+                            <div>
+                                <h3 className="font-bold text-lg text-zinc-900">{branch.branch_name}</h3>
+                                <div className="flex gap-2 items-center mt-1">
+                                    <span className="text-xs text-zinc-500 font-mono">#{branch.id}</span>
+                                    <Badge variant="outline" className="text-[10px]">{branch.show_id}</Badge>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-1">
+                                {branch.id !== 1 ? (
+                                    <>
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-8 w-8"
+                                            onClick={() => handleOpenEdit(branch)}
+                                        >
+                                            <Pencil className="h-4 w-4" />
+                                        </Button>
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                            onClick={() => handleDelete(branch.id)}
+                                        >
+                                            <Trash className="h-4 w-4" />
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <Badge variant="secondary" className="italic text-[10px] text-zinc-400">Protected</Badge>
+                                )}
+                            </div>
+                        </div>
+                        <div className="pt-2 text-xs text-zinc-500 flex justify-between items-center border-t">
+                            <span>Created At</span>
+                            <span>{new Date(branch.createdAt).toLocaleDateString()}</span>
+                        </div>
+                    </div>
+                ))}
+                {initialBranches.length === 0 && (
+                    <div className="p-8 text-center border rounded-lg text-zinc-500">
+                        No branches found. Create one to get started.
+                    </div>
+                )}
             </div>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

@@ -71,66 +71,79 @@ export default async function ReportsPage(props: {
     };
 
     return (
-        <div className="space-y-8">
-            <header>
-                <h1 className="text-3xl font-bold tracking-tight">Reports</h1>
-                <p className="text-zinc-500 mt-2">Comprehensive overview of payments across all branches and courses.</p>
+        <div className="space-y-10 pb-10">
+            <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 border-b border-zinc-100 pb-8">
+                <div>
+                    <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900">Reports</h1>
+                    <p className="text-zinc-500 mt-2 text-lg">Comprehensive overview of payments across all branches and courses.</p>
+                </div>
             </header>
 
             <ReportFilters branches={branches} courses={courses} />
 
             {/* Overview Card */}
-            <div className="grid gap-4 md:grid-cols-2">
-                <Card className="bg-white shadow-sm border-zinc-200">
+            <div className="grid gap-6 md:grid-cols-2">
+                <Card accent className="bg-primary/5 shadow-md border-zinc-200">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-zinc-600">Filtered Revenue</CardTitle>
-                        <DollarSign className="h-4 w-4 text-green-600" />
+                        <CardTitle className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Filtered Revenue</CardTitle>
+                        <div className="p-2 bg-green-50 rounded-lg">
+                            <DollarSign className="h-5 w-5 text-green-600" />
+                        </div>
                     </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-zinc-900">{formatCurrency(reports.totalRevenue)}</div>
-                        <p className="text-xs text-zinc-500 mt-1">Based on selected filters</p>
+                    <CardContent className="pt-4">
+                        <div className="text-4xl font-bold text-zinc-900">{formatCurrency(reports.totalRevenue)}</div>
+                        <div className="mt-4 flex items-center gap-2">
+                            <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 border-none px-2 py-0 text-[10px] font-bold uppercase transition-none">Live Data</Badge>
+                            <p className="text-xs text-zinc-500">Based on selected filters</p>
+                        </div>
                     </CardContent>
                 </Card>
 
-                <Card className="bg-white shadow-sm border-zinc-200">
+                <Card accent className="bg-primary/5 shadow-md border-zinc-200">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-medium text-zinc-600">Active Branches in View</CardTitle>
-                        <Building2 className="h-4 w-4 text-blue-600" />
+                        <CardTitle className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Active Branches in View</CardTitle>
+                        <div className="p-2 bg-blue-50 rounded-lg">
+                            <Building2 className="h-5 w-5 text-blue-600" />
+                        </div>
                     </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold text-zinc-900">{reports.branchTotals.length}</div>
-                        <p className="text-xs text-zinc-500 mt-1">Collecting revenue</p>
+                    <CardContent className="pt-4">
+                        <div className="text-4xl font-bold text-zinc-900">{reports.branchTotals.length}</div>
+                        <div className="mt-4 flex items-center gap-2">
+                            <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-none px-2 py-0 text-[10px] font-bold uppercase transition-none">Active</Badge>
+                            <p className="text-xs text-zinc-500">Collecting revenue</p>
+                        </div>
                     </CardContent>
                 </Card>
             </div>
 
             <div className="grid gap-8 md:grid-cols-2">
-                {/* Branch-wise breakdown */}
-                <Card className="bg-white shadow-sm border-zinc-200">
-                    <CardHeader>
-                        <CardTitle className="text-lg flex items-center gap-2">
-                            <Building2 className="h-5 w-5 text-zinc-400" />
+                <Card className="bg-primary/5 shadow-md border-zinc-200">
+                    <CardHeader className="border-b border-zinc-50 pb-4">
+                        <CardTitle className="text-lg font-bold flex items-center gap-3 text-zinc-800">
+                            <div className="p-2 bg-zinc-100 rounded-lg">
+                                <Building2 className="h-5 w-5 text-zinc-600" />
+                            </div>
                             Branch-wise Revenue
                         </CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="pt-6">
                         <Table>
                             <TableHeader>
-                                <TableRow>
-                                    <TableHead>Branch Name</TableHead>
-                                    <TableHead className="text-right">Total Revenue</TableHead>
+                                <TableRow className="hover:bg-transparent border-zinc-100">
+                                    <TableHead className="font-bold text-zinc-900">Branch Name</TableHead>
+                                    <TableHead className="text-right font-bold text-zinc-900">Total Revenue</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {reports.branchTotals.map((branch: any) => (
-                                    <TableRow key={branch.name}>
-                                        <TableCell className="font-medium">{branch.name}</TableCell>
-                                        <TableCell className="text-right">{formatCurrency(branch.total)}</TableCell>
+                                    <TableRow key={branch.name} className="border-zinc-50 hover:bg-zinc-50/50 transition-colors">
+                                        <TableCell className="font-medium text-zinc-700">{branch.name}</TableCell>
+                                        <TableCell className="text-right font-bold text-primary">{formatCurrency(branch.total)}</TableCell>
                                     </TableRow>
                                 ))}
                                 {reports.branchTotals.length === 0 && (
                                     <TableRow>
-                                        <TableCell colSpan={2} className="text-center text-zinc-400 py-4">No data available for filters</TableCell>
+                                        <TableCell colSpan={2} className="text-center text-zinc-400 py-10">No data available for filters</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
@@ -138,32 +151,33 @@ export default async function ReportsPage(props: {
                     </CardContent>
                 </Card>
 
-                {/* Course-wise breakdown */}
-                <Card className="bg-white shadow-sm border-zinc-200">
-                    <CardHeader>
-                        <CardTitle className="text-lg flex items-center gap-2">
-                            <BookOpen className="h-5 w-5 text-zinc-400" />
+                <Card className="bg-primary/5 shadow-md border-zinc-200">
+                    <CardHeader className="border-b border-zinc-50 pb-4">
+                        <CardTitle className="text-lg font-bold flex items-center gap-3 text-zinc-800">
+                            <div className="p-2 bg-zinc-100 rounded-lg">
+                                <BookOpen className="h-5 w-5 text-zinc-600" />
+                            </div>
                             Course-wise Revenue
                         </CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="pt-6">
                         <Table>
                             <TableHeader>
-                                <TableRow>
-                                    <TableHead>Course Name</TableHead>
-                                    <TableHead className="text-right">Total Revenue</TableHead>
+                                <TableRow className="hover:bg-transparent border-zinc-100">
+                                    <TableHead className="font-bold text-zinc-900">Course Name</TableHead>
+                                    <TableHead className="text-right font-bold text-zinc-900">Total Revenue</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {reports.courseTotals.map((course: any) => (
-                                    <TableRow key={course.name}>
-                                        <TableCell className="font-medium">{course.name}</TableCell>
-                                        <TableCell className="text-right">{formatCurrency(course.total)}</TableCell>
+                                    <TableRow key={course.name} className="border-zinc-50 hover:bg-zinc-50/50 transition-colors">
+                                        <TableCell className="font-medium text-zinc-700">{course.name}</TableCell>
+                                        <TableCell className="text-right font-bold text-primary">{formatCurrency(course.total)}</TableCell>
                                     </TableRow>
                                 ))}
                                 {reports.courseTotals.length === 0 && (
                                     <TableRow>
-                                        <TableCell colSpan={2} className="text-center text-zinc-400 py-4">No data available for filters</TableCell>
+                                        <TableCell colSpan={2} className="text-center text-zinc-400 py-10">No data available for filters</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>

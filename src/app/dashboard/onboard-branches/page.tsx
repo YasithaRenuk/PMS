@@ -14,13 +14,13 @@ export default async function OnboardBranchesPage() {
     const { data: branches } = await getBranches();
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
+        <div className="space-y-8 pb-10">
+            <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 border-b border-zinc-100 pb-8">
                 <div>
-                    <h1 className="text-2xl font-bold text-zinc-900">Onboard Branches</h1>
-                    <p className="text-sm text-zinc-500 mt-1">Manage system branches and their settings.</p>
+                    <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900">Onboard Branches</h1>
+                    <p className="text-zinc-500 mt-2 text-lg">Manage system branches and their settings.</p>
                 </div>
-            </div>
+            </header>
 
             <BranchManagement initialBranches={branches || []} />
         </div>

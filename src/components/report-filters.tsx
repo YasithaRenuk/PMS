@@ -10,6 +10,7 @@ interface ReportFiltersProps {
 
 import { Input } from "@/components/ui/input";
 import { Suspense } from "react";
+import { Building2, BookOpen, Calendar } from "lucide-react";
 
 export function ReportFilters(props: ReportFiltersProps) {
     return (
@@ -43,9 +44,12 @@ function FilterContent({ branches, courses }: ReportFiltersProps) {
     }
 
     return (
-        <div className="flex flex-col md:flex-row flex-wrap gap-4 mb-8">
-            <div className="w-full md:w-[200px]">
-                <label className="text-sm font-medium text-zinc-700 mb-1.5 block">Branch Filter</label>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 bg-primary/20 p-6 rounded-xl border border-zinc-200 shadow-sm">
+            <div className="space-y-2">
+                <label className="text-sm font-semibold text-zinc-700 flex items-center gap-2">
+                    <Building2 className="h-4 w-4 text-primary" />
+                    Branch Filter
+                </label>
                 <Select value={selectedBranchId} onValueChange={(v) => handleFilterChange("branchId", v)}>
                     <SelectTrigger className="bg-white">
                         <SelectValue placeholder="All Branches" />
@@ -59,8 +63,11 @@ function FilterContent({ branches, courses }: ReportFiltersProps) {
                 </Select>
             </div>
 
-            <div className="w-full md:w-[200px]">
-                <label className="text-sm font-medium text-zinc-700 mb-1.5 block">Course Filter</label>
+            <div className="space-y-2">
+                <label className="text-sm font-semibold text-zinc-700 flex items-center gap-2">
+                    <BookOpen className="h-4 w-4 text-primary" />
+                    Course Filter
+                </label>
                 <Select value={selectedCourseId} onValueChange={(v) => handleFilterChange("courseId", v)}>
                     <SelectTrigger className="bg-white">
                         <SelectValue placeholder="All Courses" />
@@ -74,23 +81,29 @@ function FilterContent({ branches, courses }: ReportFiltersProps) {
                 </Select>
             </div>
 
-            <div className="w-full md:w-[200px]">
-                <label className="text-sm font-medium text-zinc-700 mb-1.5 block">Start Date</label>
+            <div className="space-y-2">
+                <label className="text-sm font-semibold text-zinc-700 flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-primary" />
+                    Start Date
+                </label>
                 <Input
                     type="date"
                     value={selectedStartDate}
                     onChange={(e) => handleFilterChange("startDate", e.target.value)}
-                    className="bg-white"
+                    className="bg-white h-10 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                 />
             </div>
 
-            <div className="w-full md:w-[200px]">
-                <label className="text-sm font-medium text-zinc-700 mb-1.5 block">End Date</label>
+            <div className="space-y-2">
+                <label className="text-sm font-semibold text-zinc-700 flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-primary" />
+                    End Date
+                </label>
                 <Input
                     type="date"
                     value={selectedEndDate}
                     onChange={(e) => handleFilterChange("endDate", e.target.value)}
-                    className="bg-white"
+                    className="bg-white h-10 rounded-lg focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
                 />
             </div>
         </div>

@@ -71,11 +71,10 @@ export default async function ReportsPage(props: {
     };
 
     return (
-        <div className="space-y-10 pb-10">
-            <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 border-b border-zinc-100 pb-8">
+        <div className="space-y-2 pb-1">
+            <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 border-b border-zinc-100 pb-4">
                 <div>
                     <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900">Reports</h1>
-                    <p className="text-zinc-500 mt-2 text-lg">Comprehensive overview of payments across all branches and courses.</p>
                 </div>
             </header>
 

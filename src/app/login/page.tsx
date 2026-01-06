@@ -10,8 +10,8 @@ export default async function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-100 px-4 py-10">
-      <main className="flex w-full max-w-3xl flex-col items-center gap-8 rounded-2xl border border-zinc-100 bg-white p-10 shadow-lg">
+    <div className="flex min-h-screen items-center justify-center px-4 py-10">
+      <main className="flex w-full max-w-3xl flex-col items-center gap-8 rounded-2xl p-10 ">
         <LoginForm />
       </main>
     </div>

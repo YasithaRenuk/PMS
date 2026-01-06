@@ -71,17 +71,6 @@ export default async function ReportsPage(props: {
             <header>
                 <h1 className="text-3xl font-bold tracking-tight">Reports</h1>
                 <p className="text-zinc-500 mt-2">Comprehensive overview of payments across all branches and courses.</p>
-                <div className="flex gap-2 mt-4">
-                    {branchIdParam && branchIdParam !== "all" && (
-                        <Badge variant="secondary">Branch ID: {branchIdParam}</Badge>
-                    )}
-                    {courseIdParam && courseIdParam !== "all" && (
-                        <Badge variant="secondary">Course ID: {courseIdParam}</Badge>
-                    )}
-                    {!((branchIdParam && branchIdParam !== "all") || (courseIdParam && courseIdParam !== "all")) && (
-                        <Badge variant="outline">No filters active</Badge>
-                    )}
-                </div>
             </header>
 
             <ReportFilters branches={branches} courses={courses} />

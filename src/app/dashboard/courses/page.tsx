@@ -16,9 +16,17 @@ export default async function CoursesPage() {
     }
 
     return (
-        <CourseList
-            initialCourses={courses || []}
-            userRole={session.user.role}
-        />
+        <div className="space-y-2 pb-1">
+            <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 border-b border-zinc-100 pb-4">
+                <div>
+                    <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900">Courses</h1>
+                </div>
+            </header>
+
+            <CourseList
+                initialCourses={courses || []}
+                userRole={session.user.role}
+            />
+        </div>
     );
 }

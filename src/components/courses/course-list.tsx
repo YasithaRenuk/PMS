@@ -6,7 +6,7 @@ import { CourseDialog } from "./course-dialog";
 import { deleteCourse } from "@/app/actions/course-actions";
 import { Role } from "@/app/generated/prisma/enums";
 import { useState } from "react";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type Course = {
@@ -45,11 +45,10 @@ export function CourseList({ initialCourses, userRole }: CourseListProps) {
 
     return (
         <div className="space-y-4">
-            <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold tracking-tight">Courses</h2>
+            <div className="flex justify-end items-center">
                 {canManage && (
                     <CourseDialog
-                        trigger={<Button>Add Course</Button>}
+                        trigger={<Button> <Plus className="mr-2 h-4 w-4" />Add Course</Button>}
                         onSuccess={() => router.refresh()}
                     />
                 )}

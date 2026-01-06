@@ -76,7 +76,7 @@ export function AppSidebar() {
           </div>
           <div className="flex-1 min-w-0 transition-opacity group-data-[state=collapsed]:opacity-0 overflow-hidden">
             <h1 className="text-lg font-bold tracking-tight text-zinc-900 leading-none mb-1">
-              PMS
+              MITL
             </h1>
             <p className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
               Campus

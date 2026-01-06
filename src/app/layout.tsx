@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PMS",
+  title: "MITL PMS",
   description: "Property Management System",
 };
 

@@ -24,6 +24,7 @@ import {
   updateStudent,
 } from "@/app/actions/student-actions";
 import { Role } from "@/app/generated/prisma/enums";
+import { toast } from "sonner";
 
 type Branch = {
   id: number;
@@ -169,6 +170,7 @@ export function StudentDialog({
         throw new Error(result.error || "Failed to save student");
       }
 
+      toast.success(isEdit ? "Student updated successfully" : "Student created successfully");
       setEffectiveOpen(false);
       if (onSuccess) onSuccess();
     } catch (err: any) {

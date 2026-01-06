@@ -24,6 +24,7 @@ import { Label } from "@/components/ui/label";
 import { Plus, Pencil, Trash } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 
 type Branch = {
     id: number;
@@ -69,9 +70,11 @@ export function BranchManagement({ initialBranches }: { initialBranches: Branch[
             if (editingBranch) {
                 const res = await updateBranch(editingBranch.id, formData);
                 if (!res.success) throw new Error(res.error);
+                toast.success("Branch updated successfully");
             } else {
                 const res = await createBranch(formData);
                 if (!res.success) throw new Error(res.error);
+                toast.success("Branch created successfully");
             }
             setIsDialogOpen(false);
             router.refresh();
@@ -88,6 +91,7 @@ export function BranchManagement({ initialBranches }: { initialBranches: Branch[
         try {
             const res = await deleteBranch(id);
             if (!res.success) throw new Error(res.error);
+            toast.success("Branch deleted successfully");
             router.refresh();
         } catch (err: any) {
             alert(err.message);

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createCourse, updateCourse } from "@/app/actions/course-actions";
+import { toast } from "sonner";
 
 type Course = {
     id: number;
@@ -49,6 +50,7 @@ export function CourseDialog({ course, trigger, open, onOpenChange, onSuccess }:
                 throw new Error(result.error || "Failed to save course");
             }
 
+            toast.success(isEdit ? "Course updated successfully" : "Course created successfully");
             setEffectiveOpen(false);
             if (onSuccess) onSuccess();
             if (!isEdit) {

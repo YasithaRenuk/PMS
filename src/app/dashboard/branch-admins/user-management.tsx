@@ -32,6 +32,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Plus, Pencil, Trash } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
 
 type User = {
     id: number;
@@ -115,6 +116,7 @@ export function UserManagement({ initialUsers, branches, currentUser }: { initia
 
                 const res = await updateUser(editingUser.id, payload);
                 if (!res.success) throw new Error(res.error);
+                toast.success("User updated successfully");
             } else {
                 if (!formData.password) throw new Error("Password is required for new users");
                 const createPayload = {
@@ -123,6 +125,7 @@ export function UserManagement({ initialUsers, branches, currentUser }: { initia
                 };
                 const res = await createUser(createPayload);
                 if (!res.success) throw new Error(res.error);
+                toast.success("User created successfully");
             }
             setIsDialogOpen(false);
             router.refresh();
@@ -139,6 +142,7 @@ export function UserManagement({ initialUsers, branches, currentUser }: { initia
         try {
             const res = await deleteUser(id);
             if (!res.success) throw new Error(res.error);
+            toast.success("User deleted successfully");
             router.refresh();
         } catch (err: any) {
             alert(err.message);

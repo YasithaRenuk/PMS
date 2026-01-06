@@ -11,6 +11,7 @@ interface ReportFiltersProps {
 import { Input } from "@/components/ui/input";
 import { Suspense } from "react";
 import { Building2, BookOpen, Calendar } from "lucide-react";
+import { toast } from "sonner";
 
 export function ReportFilters(props: ReportFiltersProps) {
     return (
@@ -31,6 +32,7 @@ function FilterContent({ branches, courses }: ReportFiltersProps) {
 
     function handleFilterChange(key: string, value: string) {
         console.log(`Filter change: ${key} = ${value}`);
+        toast.success(`Filter updated: ${key} set to ${value}`);
         const params = new URLSearchParams(searchParams.toString());
         if (value && value !== "all") {
             params.set(key, value);

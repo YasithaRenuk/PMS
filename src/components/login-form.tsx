@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
 
 export function LoginForm() {
   const router = useRouter();
@@ -46,6 +47,7 @@ export function LoginForm() {
       return;
     }
 
+    toast.success("Logged in successfully");
     router.refresh();
   };
 

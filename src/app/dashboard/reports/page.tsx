@@ -125,7 +125,7 @@ export default async function ReportsPage(props: {
                             Branch-wise Revenue
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="pt-6">
+                    <CardContent className="pt-2">
                         <Table>
                             <TableHeader>
                                 <TableRow className="hover:bg-transparent border-zinc-100">
@@ -159,7 +159,7 @@ export default async function ReportsPage(props: {
                             Course-wise Revenue
                         </CardTitle>
                     </CardHeader>
-                    <CardContent className="pt-6">
+                    <CardContent className="pt-2">
                         <Table>
                             <TableHeader>
                                 <TableRow className="hover:bg-transparent border-zinc-100">

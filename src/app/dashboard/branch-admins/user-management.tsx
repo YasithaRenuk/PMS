@@ -161,7 +161,7 @@ export function UserManagement({ initialUsers, branches, currentUser }: { initia
                 )}
             </div>
 
-            <div className="rounded-md border">
+            <div>
                 <Table>
                     <TableHeader>
                         <TableRow>

@@ -55,7 +55,7 @@ export function CourseList({ initialCourses, userRole }: CourseListProps) {
                 )}
             </div>
 
-            <div className="rounded-md border">
+            <div>
                 <Table>
                     <TableHeader>
                         <TableRow>

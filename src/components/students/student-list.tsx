@@ -169,7 +169,7 @@ export function StudentList({ students, branches, courses, userRole }: StudentLi
             </div>
 
             {/* Desktop Table */}
-            <div className="hidden md:block rounded-md border">
+            <div className="hidden md:block">
                 <Table>
                     <TableHeader>
                         <TableRow>

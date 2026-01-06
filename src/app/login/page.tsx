@@ -6,7 +6,7 @@ export default async function LoginPage() {
   const session = await getServerAuthSession();
 
   if (session?.user) {
-    redirect("/");
+    redirect("/dashboard");
   }
 
   return (

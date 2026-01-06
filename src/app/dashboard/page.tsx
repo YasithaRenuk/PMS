@@ -6,7 +6,7 @@ export default async function Home() {
   const session = await getServerAuthSession();
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-100 px-4 py-10">
+    <div className="flex items-center justify-center px-4 py-10">
       <main className="flex w-full max-w-3xl flex-col items-center gap-8 rounded-2xl border border-zinc-100 bg-white p-10 shadow-lg">
         {session?.user ? (
           <div className="flex w-full flex-col gap-4 text-left">

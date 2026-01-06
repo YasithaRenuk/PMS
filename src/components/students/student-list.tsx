@@ -10,7 +10,7 @@ import { PaymentRecordsDialog } from "./payment-records-dialog";
 import { deleteStudent } from "@/app/actions/student-actions";
 import { Role } from "@/app/generated/prisma/enums";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Pencil, Trash2, Search, DollarSign, Receipt } from "lucide-react";
+import { Pencil, Trash2, Search, DollarSign, Receipt, Eye } from "lucide-react";
 import { useState, useCallback } from "react";
 
 // Helper for debounce if library not present (assuming I should check but standard to have one)
@@ -204,7 +204,7 @@ export function StudentList({ students, branches, courses, userRole }: StudentLi
                                         studentName={student.full_name}
                                         trigger={
                                             <Button variant="ghost" size="icon" title="Payment Records">
-                                                <Receipt className="h-4 w-4" />
+                                                <Eye className="h-4 w-4" />
                                             </Button>
                                         }
                                     />

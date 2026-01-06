@@ -1,18 +1,17 @@
-import { Clipboard, GitBranch, LibraryBig, Settings, ShieldUser, User } from "lucide-react";
+"use client";
+
+import { Clipboard, GitBranch, LibraryBig, LogOut, Settings, ShieldUser, User } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { getServerAuthSession } from "@/lib/auth";
-import { redirect } from "next/navigation";
 import { Role } from "@/app/generated/prisma/enums";
 import { SignOutButton } from "./sign-out-button";
 import {
@@ -21,6 +20,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 const admin_Items = [
   {
@@ -54,76 +57,111 @@ const superAdmin_Items = [
   },
 ];
 
-export async function AppSidebar() {
-  const session = await getServerAuthSession();
+export function AppSidebar() {
+  const pathname = usePathname();
+  const { data: session } = useSession();
 
   if (!session) {
-    redirect("/login");
+    return null;
   }
 
-  let items = admin_Items;
-
-  if (session.user.role === Role.superAdmin) {
-    items = superAdmin_Items;
-  }
+  const items = session.user.role === Role.superAdmin ? superAdmin_Items : admin_Items;
 
   return (
-    <Sidebar collapsible="icon">
-      <SidebarContent>
-        <SidebarHeader>
-          <div className="flex items-center gap-3 mb-4 px-2">
-            <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center text-xs font-medium text-zinc-600">
-              MITL
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-zinc-900 truncate">
-                MITL Campus
-              </p>
-            </div>
+    <Sidebar className="border-r border-zinc-200">
+      <SidebarHeader className="p-4">
+        <div className="flex items-center gap-3 px-2">
+          <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 shrink-0 transform transition-transform group-data-[state=collapsed]:scale-90">
+            <LibraryBig className="w-6 h-6" />
           </div>
-        </SidebarHeader>
+          <div className="flex-1 min-w-0 transition-opacity group-data-[state=collapsed]:opacity-0 overflow-hidden">
+            <h1 className="text-lg font-bold tracking-tight text-zinc-900 leading-none mb-1">
+              PMS
+            </h1>
+            <p className="text-xs font-medium text-zinc-500 uppercase tracking-widest">
+              Campus
+            </p>
+          </div>
+        </div>
+      </SidebarHeader>
+
+      <SidebarContent className="px-4 py-2">
         <SidebarGroup>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+            <SidebarMenu className="gap-2">
+              {items.map((item) => {
+                const isActive = pathname === item.url;
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={isActive}
+                      tooltip={item.title}
+                      className={cn(
+                        "h-11 px-4 transition-all duration-200 rounded-lg group/btn",
+                        isActive
+                          ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90 hover:text-primary-foreground"
+                          : "text-zinc-600 hover:bg-zinc-100 hover:text-primary"
+                      )}
+                    >
+                      <Link href={item.url} className="flex items-center gap-3 w-full">
+                        <item.icon className={cn(
+                          "w-5 h-5 transition-colors",
+                          isActive ? "text-primary-foreground" : "text-zinc-50/50 group-hover/btn:text-primary"
+                        )} />
+                        <span className="font-medium">{item.title}</span>
+                        {isActive && (
+                          <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-foreground/40 shadow-sm" />
+                        )}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+
+      <SidebarFooter className="p-4 mt-auto">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <div className="flex items-center gap-3 mb-4 px-2">
-                  <div className="w-8 h-8 rounded-full bg-zinc-100 flex items-center justify-center text-xs font-medium text-zinc-600">
+                <div className="flex items-center gap-3 p-2 rounded-xl border border-transparent hover:border-zinc-200 hover:bg-zinc-50 transition-all cursor-pointer group/user overflow-hidden">
+                  <div className="w-9 h-9 rounded-lg bg-zinc-900 flex items-center justify-center text-sm font-semibold text-white shrink-0 shadow-sm">
                     {session.user.username.slice(0, 2).toUpperCase()}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-zinc-900 truncate">
+                  <div className="flex-1 min-w-0 transition-opacity group-data-[state=collapsed]:opacity-0 overflow-hidden">
+                    <p className="text-sm font-bold text-zinc-900 truncate">
                       {session.user.username}
                     </p>
-                    <p className="text-xs text-zinc-500 truncate capitalize">
+                    <p className="text-[10px] text-zinc-500 truncate uppercase font-bold tracking-wider">
                       {session.user.role}
                     </p>
                   </div>
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent
-                side="top"
-                className="w-[--radix-popper-anchor-width]"
+                side="right"
+                align="end"
+                className="w-56 p-2 rounded-xl shadow-xl border-zinc-100"
               >
-                <DropdownMenuItem>
-                  <SignOutButton />
+                <div className="px-2 py-1.5 mb-2">
+                  <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">My Account</p>
+                </div>
+                <DropdownMenuItem className="rounded-lg focus:bg-zinc-50 cursor-pointer group/item py-2">
+                  <Link href="/dashboard/settings" className="flex items-center gap-2 w-full">
+                    <Settings className="w-4 h-4 text-zinc-400 group-hover/item:text-zinc-900" />
+                    <span className="font-medium">Settings</span>
+                  </Link>
+                </DropdownMenuItem>
+                <div className="h-px bg-zinc-100 my-1 mx-[-0.5rem]" />
+                <DropdownMenuItem className="rounded-lg focus:bg-red-50 cursor-pointer group/logout py-2">
+                  <div className="flex items-center gap-2 w-full text-red-600">
+                    <LogOut className="w-4 h-4" />
+                    <SignOutButton className="font-medium bg-transparent border-none p-0 h-auto hover:bg-transparent text-red-600" />
+                  </div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

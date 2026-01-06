@@ -17,14 +17,12 @@ export default async function BranchAdminsPage() {
     ]);
 
     return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
+        <div className="space-y-2 pb-1">
+            <header className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 border-b border-zinc-100 pb-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-zinc-900">Branch Admins</h1>
-                    <p className="text-sm text-zinc-500 mt-1">Manage system administrators and branch users.</p>
+                    <h1 className="text-4xl font-extrabold tracking-tight text-zinc-900">Branch Admins</h1>
                 </div>
-            </div>
-
+            </header>
             <UserManagement
                 initialUsers={users || []}
                 branches={branches || []}

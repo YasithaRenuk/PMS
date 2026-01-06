@@ -10,7 +10,7 @@ import { PaymentRecordsDialog } from "./payment-records-dialog";
 import { deleteStudent } from "@/app/actions/student-actions";
 import { Role } from "@/app/generated/prisma/enums";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Pencil, Trash2, Search, DollarSign, Receipt, Eye } from "lucide-react";
+import { Pencil, Trash2, Search, DollarSign, Receipt, Eye, Plus } from "lucide-react";
 import { useState, useCallback } from "react";
 
 // Helper for debounce if library not present (assuming I should check but standard to have one)
@@ -114,13 +114,12 @@ export function StudentList({ students, branches, courses, userRole }: StudentLi
 
     return (
         <div className="space-y-4">
-            <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold tracking-tight">Students</h2>
+            <div className="flex justify-end items-center">
                 <StudentDialog
                     courses={courses}
                     branches={branches}
                     userRole={userRole}
-                    trigger={<Button>Add Student</Button>}
+                    trigger={<Button> <Plus className="mr-2 h-4 w-4" /> Add Student</Button>}
                     onSuccess={() => router.refresh()}
                 />
             </div>

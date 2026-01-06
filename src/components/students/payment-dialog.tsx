@@ -22,6 +22,7 @@ export function PaymentDialog({ studentId, studentName, trigger, onSuccess }: Pa
     const [summaryLoading, setSummaryLoading] = useState(false);
     const [amount, setAmount] = useState("");
     const [paymentMethod, setPaymentMethod] = useState("");
+    const [formError, setFormError] = useState<string | null>(null);
     const [summary, setSummary] = useState<{
         totalFees: number;
         totalPaid: number;
@@ -32,6 +33,7 @@ export function PaymentDialog({ studentId, studentName, trigger, onSuccess }: Pa
     // Load payment summary when dialog opens
     useEffect(() => {
         if (open) {
+            setFormError(null);
             loadSummary();
         }
     }, [open]);
@@ -52,14 +54,21 @@ export function PaymentDialog({ studentId, studentName, trigger, onSuccess }: Pa
 
         const paymentAmount = parseFloat(amount);
         if (isNaN(paymentAmount) || paymentAmount <= 0) {
-            alert("Please enter a valid payment amount");
+            setFormError("Please enter a valid payment amount");
+            return;
+        }
+
+        if (summary && paymentAmount > summary.remainingBalance) {
+            setFormError(`Payment amount cannot exceed the remaining balance (Rs. ${summary.remainingBalance.toFixed(2)})`);
             return;
         }
 
         if (!paymentMethod) {
-            alert("Please select a payment method");
+            setFormError("Please select a payment method");
             return;
         }
+
+        setFormError(null);
 
         setLoading(true);
         const result = await createPayment({
@@ -140,14 +149,24 @@ export function PaymentDialog({ studentId, studentName, trigger, onSuccess }: Pa
                                     min="0"
                                     placeholder="Enter amount to pay"
                                     value={amount}
-                                    onChange={(e) => setAmount(e.target.value)}
+                                    onChange={(e) => {
+                                        setAmount(e.target.value);
+                                        setFormError(null);
+                                    }}
                                     required
                                 />
                             </div>
 
                             <div className="space-y-2">
                                 <Label htmlFor="payment-method">Payment Method</Label>
-                                <Select value={paymentMethod} onValueChange={setPaymentMethod} required>
+                                <Select
+                                    value={paymentMethod}
+                                    onValueChange={(val) => {
+                                        setPaymentMethod(val);
+                                        setFormError(null);
+                                    }}
+                                    required
+                                >
                                     <SelectTrigger id="payment-method">
                                         <SelectValue placeholder="Select payment method" />
                                     </SelectTrigger>
@@ -161,6 +180,12 @@ export function PaymentDialog({ studentId, studentName, trigger, onSuccess }: Pa
                                 </Select>
                             </div>
                         </div>
+
+                        {formError && (
+                            <div className="p-3 rounded-md bg-destructive/15 text-destructive text-sm font-medium">
+                                {formError}
+                            </div>
+                        )}
 
                         <div className="flex justify-end gap-3">
                             <Button type="button" variant="outline" onClick={() => setOpen(false)}>

@@ -198,3 +198,137 @@ export async function getStudentPayments(studentId: number) {
     return { success: false, error: "Failed to get student payments" };
   }
 }
+
+export async function getPaymentReports(filters?: { branchId?: number; courseId?: number }) {
+  try {
+    const session = await getServerAuthSession();
+    if (!session || session.user.role !== Role.superAdmin) {
+      throw new Error("Unauthorized");
+    }
+
+    const where: any = { deletedAt: null };
+    
+    // Add student filter ensuring students are not deleted
+    const studentFilter: any = { deletedAt: null };
+    let hasStudentFilter = false;
+
+    if (filters?.branchId) {
+        studentFilter.branchId = filters.branchId;
+        hasStudentFilter = true;
+    }
+
+    if (filters?.courseId) {
+        studentFilter.enrollments = {
+            some: {
+                courseId: filters.courseId,
+                deletedAt: null
+            }
+        };
+        hasStudentFilter = true;
+    }
+
+    if (hasStudentFilter) {
+        where.student = studentFilter;
+    }
+
+    console.log("getPaymentReports logic:", {
+        filters,
+        whereClause: JSON.stringify(where, null, 2)
+    });
+
+    // Get all payments with student and branch info
+    const allPayments = await prisma.payment.findMany({
+      where,
+      include: {
+        student: {
+          include: {
+            branch: true,
+            enrollments: {
+              where: { deletedAt: null },
+              include: {
+                course: true
+              }
+            }
+          }
+        }
+      },
+      orderBy: { date: 'desc' }
+    });
+
+    console.log(`Found ${allPayments.length} payments after filtering.`);
+
+    const branchTotals: Record<string, number> = {};
+    const courseTotals: Record<string, number> = {};
+    let totalRevenue = 0;
+
+    const courses = await prisma.course.findMany({ where: { deletedAt: null } });
+
+    allPayments.forEach(payment => {
+      const amount = payment.fee;
+      
+      // Course Aggregation (Proportional distribution)
+      const enrollments = payment.student.enrollments;
+      const totalStudentFees = enrollments.reduce((sum, e) => sum + e.course.fee, 0);
+
+      let attributedToFilteredCourse = 0;
+      if (totalStudentFees > 0) {
+        enrollments.forEach(enrollment => {
+          const courseName = enrollment.course.name;
+          const proportion = enrollment.course.fee / totalStudentFees;
+          const attributedAmount = amount * proportion;
+          
+          courseTotals[courseName] = (courseTotals[courseName] || 0) + attributedAmount;
+          
+          if (filters?.courseId === enrollment.courseId) {
+             attributedToFilteredCourse = attributedAmount;
+          }
+        });
+      }
+
+      // If filtering by course, total revenue is only what's attributed to that course
+      // Otherwise it's the full payment amount
+      if (filters?.courseId) {
+        totalRevenue += attributedToFilteredCourse;
+      } else {
+        totalRevenue += amount;
+      }
+
+      // Branch Aggregation
+      const branchName = payment.student.branch.branch_name;
+      branchTotals[branchName] = (branchTotals[branchName] || 0) + amount;
+    });
+
+    // Format for easier display
+    let formattedBranchTotals = Object.entries(branchTotals).map(([name, total]) => ({ name, total }));
+    let formattedCourseTotals = Object.entries(courseTotals).map(([name, total]) => ({ name, total }));
+
+    // If filtering by branch/course, we might want to ensure the list is focused or sorted
+    if (filters?.branchId) {
+        formattedBranchTotals = formattedBranchTotals.sort((a, b) => b.total - a.total);
+    }
+    
+    // When filtering by a specific course, we only want to show that course in the summary table
+    // or at least prioritize it.
+    if (filters?.courseId) {
+        const filteredCourse = courses.find(c => c.id === filters.courseId);
+        if (filteredCourse) {
+            formattedCourseTotals = formattedCourseTotals.filter(c => c.name === filteredCourse.name);
+        }
+    } else {
+        formattedCourseTotals = formattedCourseTotals.sort((a, b) => b.total - a.total);
+    }
+
+    return {
+      success: true,
+      data: {
+        totalRevenue: Math.round(totalRevenue * 100) / 100, // Round to 2 decimals
+        branchTotals: formattedBranchTotals,
+        courseTotals: formattedCourseTotals,
+      }
+    };
+
+  } catch (error) {
+    console.error("Failed to fetch reports:", error);
+    return { success: false, error: "Failed to fetch reports" };
+  }
+}

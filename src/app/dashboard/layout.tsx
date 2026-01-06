@@ -39,6 +39,12 @@ export default async function DashboardLayout({
                             >
                                 Branch Admins
                             </Link>
+                            <Link
+                                href="/dashboard/reports"
+                                className="flex items-center px-3 py-2 text-sm font-medium text-zinc-600 rounded-md hover:bg-zinc-50 hover:text-zinc-900 transition-colors"
+                            >
+                                Reports
+                            </Link>
                         </>
                     )}
 

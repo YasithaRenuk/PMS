@@ -12,8 +12,10 @@ model Branch {
   branch_name String
   show_id     String
   users       User[]
+  students    Student[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  deletedAt   DateTime?
 }
 
 model User {
@@ -23,11 +25,58 @@ model User {
   role      Role     @default(admin)
   branchId  Int?
   branch    Branch?  @relation(fields: [branchId], references: [id])
+  payments  Payment[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 }
 
 enum Role {
   superAdmin
   admin
+}
+
+model Student {
+  id           Int          @id @default(autoincrement())
+  full_name    String       @unique
+  phone_number String
+  student_id   String       @unique
+  enrollments  Enrollment[]
+  payments     Payment[]
+  branchId     Int
+  branch       Branch       @relation(fields: [branchId], references: [id])
+  deletedAt    DateTime?
+}
+
+model Course {
+  id          Int          @id @default(autoincrement())
+  name        String
+  fee         Float
+  enrollments Enrollment[]
+  deletedAt   DateTime?
+}
+
+model Payment {
+  id             Int       @id @default(autoincrement())
+  payment_method String
+  fee            Float
+  date           DateTime  @default(now())
+  time           String
+  studentId      Int
+  student        Student   @relation(fields: [studentId], references: [id])
+  userId         Int
+  user           User      @relation(fields: [userId], references: [id])
+  sms_status     Boolean   @default(false)
+  deletedAt      DateTime?
+}
+
+model Enrollment {
+  studentId  Int
+  courseId   Int
+  student    Student  @relation(fields: [studentId], references: [id])
+  course     Course   @relation(fields: [courseId], references: [id])
+  assignedAt DateTime @default(now())
+  deletedAt  DateTime?
+
+  @@id([studentId, courseId])
 }

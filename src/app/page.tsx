@@ -1,39 +1,17 @@
 import { LoginForm } from "@/components/login-form";
-import { SignOutButton } from "@/components/sign-out-button";
 import { getServerAuthSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export default async function Home() {
   const session = await getServerAuthSession();
 
+  if (session?.user) {
+    redirect("/dashboard");
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 via-white to-slate-100 px-4 py-10">
-      <main className="flex w-full max-w-3xl flex-col items-center gap-8 rounded-2xl border border-zinc-100 bg-white p-10 shadow-lg">
-        {session?.user ? (
-          <div className="flex w-full flex-col gap-4 text-left">
-            <div>
-              <p className="text-sm font-semibold text-zinc-500">
-                Authenticated
-              </p>
-              <h1 className="text-3xl font-bold text-zinc-900">
-                Welcome back, {session.user.username}
-              </h1>
-              <p className="text-sm text-zinc-600">
-                Role: <span className="font-semibold">{session.user.role}</span>
-                {session.user.branchName
-                  ? ` • Branch: ${session.user.branchName} (#${session.user.branchId})`
-                  : session.user.branchId
-                    ? ` • Branch ID: ${session.user.branchId}`
-                    : " • No branch assigned"}
-              </p>
-            </div>
-            <div className="flex items-center gap-3">
-              <SignOutButton />
-            </div>
-          </div>
-        ) : (
-          <LoginForm />
-        )}
-      </main>
+    <div className="flex min-h-screen items-center justify-center">
+      <LoginForm />
     </div>
   );
 }

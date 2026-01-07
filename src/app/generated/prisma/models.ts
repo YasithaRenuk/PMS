@@ -10,4 +10,8 @@
  */
 export type * from './models/Branch'
 export type * from './models/User'
+export type * from './models/Student'
+export type * from './models/Course'
+export type * from './models/Payment'
+export type * from './models/Enrollment'
 export type * from './commonInputTypes'

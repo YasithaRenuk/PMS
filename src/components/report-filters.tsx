@@ -46,7 +46,7 @@ function FilterContent({ branches, courses }: ReportFiltersProps) {
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 bg-primary/20 p-6 rounded-xl border border-zinc-200 shadow-sm">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 bg-white p-6 rounded-xl border-b-4 border-b-zinc-200 shadow-sm">
             <div className="space-y-2">
                 <label className="text-sm font-semibold text-zinc-700 flex items-center gap-2">
                     <Building2 className="h-4 w-4 text-primary" />

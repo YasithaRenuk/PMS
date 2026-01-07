@@ -188,86 +188,125 @@ export function StudentDialog({
   return (
     <Dialog open={effectiveOpen} onOpenChange={setEffectiveOpen}>
       {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-      <DialogContent className="max-w-md overflow-visible">
+      <DialogContent className="max-w-xl overflow-visible">
         <DialogHeader>
           <DialogTitle>
-            {isEdit ? "Edit Student" : "Add Student"}
+            {isEdit ? "Edit Student Details" : "Register New Student"}
           </DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-6 py-4">
           {error && (
-            <p className="text-red-500 text-sm">{error}</p>
+            <p className="text-destructive text-sm font-medium bg-destructive/10 p-3 rounded-md">{error}</p>
           )}
 
-          <div className="space-y-2">
-            <Label htmlFor="fullName">Full Name</Label>
-            <Input
-              id="fullName"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              required
-            />
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Personal Information */}
+            <div className="md:col-span-2">
+              <h3 className="text-sm font-medium text-muted-foreground mb-3">Personal Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Full Name</Label>
+                  <div className="relative">
+                    <Input
+                      id="fullName"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      required
+                      placeholder="John Doe"
+                      className="bg-muted/30 focus:bg-background pl-9"
+                    />
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                    </div>
+                  </div>
+                </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="phone">Phone Number</Label>
-            <Input
-              id="phone"
-              value={phoneNumber}
-              onChange={handlePhoneChange}
-              maxLength={10}
-              required
-            />
-            {phoneError && (
-              <p className="text-sm text-red-500">
-                {phoneError}
-              </p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="studentId">Student ID</Label>
-            <Input
-              id="studentId"
-              value={studentId}
-              onChange={(e) => setStudentId(e.target.value)}
-              required
-            />
-          </div>
-
-          {isSuperAdmin && (
-            <div className="space-y-2">
-              <Label htmlFor="branch">Branch</Label>
-              <Select value={branchId} onValueChange={setBranchId}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select branch" />
-                </SelectTrigger>
-                <SelectContent>
-                  {branches.map((branch) => (
-                    <SelectItem
-                      key={branch.id}
-                      value={branch.id.toString()}
-                    >
-                      {branch.branch_name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <div className="relative">
+                    <Input
+                      id="phone"
+                      value={phoneNumber}
+                      onChange={handlePhoneChange}
+                      maxLength={10}
+                      required
+                      placeholder="07XXXXXXXX"
+                      className={`bg-muted/30 focus:bg-background pl-9 ${phoneError ? "border-destructive focus-visible:ring-destructive" : ""}`}
+                    />
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
+                    </div>
+                  </div>
+                  {phoneError && (
+                    <p className="text-xs text-destructive font-medium mt-1">
+                      {phoneError}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
-          )}
 
-          <div className="space-y-2">
-            <Label>Courses</Label>
-            <MultiSelect
-              options={courseOptions}
-              selected={selectedCourseIds}
-              onChange={setSelectedCourseIds}
-              placeholder="Select courses..."
-            />
+            {/* divider */}
+            <div className="md:col-span-2 border-t" />
+
+            {/* Academic Information */}
+            <div className="md:col-span-2">
+              <h3 className="text-sm font-medium text-muted-foreground mb-3">Academic Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="studentId">Student ID</Label>
+                  <div className="relative">
+                    <Input
+                      id="studentId"
+                      value={studentId}
+                      onChange={(e) => setStudentId(e.target.value)}
+                      required
+                      placeholder="ST-0001"
+                      className="bg-muted/30 focus:bg-background pl-9 font-mono"
+                    />
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="18" height="18" x="3" y="3" rx="2" ry="2" /><path d="M3 9h18" /><path d="M3 15h18" /><path d="M9 3v18" /></svg>
+                    </div>
+                  </div>
+                </div>
+
+                {isSuperAdmin && (
+                  <div className="space-y-2">
+                    <Label htmlFor="branch">Branch</Label>
+                    <Select value={branchId} onValueChange={setBranchId}>
+                      <SelectTrigger className="bg-muted/30 focus:bg-background">
+                        <SelectValue placeholder="Select branch" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {branches.map((branch) => (
+                          <SelectItem
+                            key={branch.id}
+                            value={branch.id.toString()}
+                          >
+                            {branch.branch_name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                <div className={`space-y-2 ${isSuperAdmin ? "md:col-span-2" : "md:col-span-1"}`}>
+                  <Label>Enrolled Courses</Label>
+                  <MultiSelect
+                    options={courseOptions}
+                    selected={selectedCourseIds}
+                    onChange={setSelectedCourseIds}
+                    placeholder="Select courses..."
+                    className="bg-muted/30"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
 
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-3 pt-4 border-t">
             <Button
               type="button"
               variant="outline"
@@ -275,8 +314,8 @@ export function StudentDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading ? "Saving..." : "Save"}
+            <Button type="submit" disabled={loading} className="px-8 shadow-sm">
+              {loading ? "Saving..." : "Save Student"}
             </Button>
           </div>
         </form>

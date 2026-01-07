@@ -10,8 +10,10 @@ import { PaymentRecordsDialog } from "./payment-records-dialog";
 import { deleteStudent } from "@/app/actions/student-actions";
 import { Role } from "@/app/generated/prisma/enums";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Pencil, Trash2, Search, DollarSign, Receipt, Eye, Plus } from "lucide-react";
+import { Pencil, Trash2, Search, DollarSign, Eye, Plus } from "lucide-react";
 import { useState, useCallback } from "react";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 // Helper for debounce if library not present (assuming I should check but standard to have one)
 // But to avoid install, I'll use a simple custom hook or plain timeout for now if use-debounce isn't there.
@@ -102,13 +104,12 @@ export function StudentList({ students, branches, courses, userRole }: StudentLi
     }
 
     async function handleDelete(id: number) {
-        if (!confirm("Are you sure you want to delete this student?")) return;
-
         const result = await deleteStudent(id);
         if (result.success) {
+            toast.success("Student deleted successfully");
             router.refresh();
         } else {
-            alert(result.error);
+            toast.error(result.error || "Failed to delete student");
         }
     }
 
@@ -222,14 +223,31 @@ export function StudentList({ students, branches, courses, userRole }: StudentLi
                                         }
                                         onSuccess={() => router.refresh()}
                                     />
-                                    <Button
-                                        variant="ghost"
-                                        size="icon"
-                                        className="text-red-500 hover:text-red-600"
-                                        onClick={() => handleDelete(student.id)}
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                className="text-red-500 hover:text-red-600"
+                                            >
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    This action cannot be undone. This will permanently delete the student and remove their data from our servers.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleDelete(student.id)} className="bg-red-500 hover:bg-red-600">
+                                                    Delete
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -285,14 +303,31 @@ export function StudentList({ students, branches, courses, userRole }: StudentLi
                                     }
                                     onSuccess={() => router.refresh()}
                                 />
-                                <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="h-8 w-8 text-red-500 hover:text-red-600"
-                                    onClick={() => handleDelete(student.id)}
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button
+                                            variant="outline"
+                                            size="icon"
+                                            className="h-8 w-8 text-red-500 hover:text-red-600"
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                            <AlertDialogDescription>
+                                                This action cannot be undone. This will permanently delete the student.
+                                            </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                            <AlertDialogAction onClick={() => handleDelete(student.id)} className="bg-red-500 hover:bg-red-600">
+                                                Delete
+                                            </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
                             </div>
                         </div>
                         <div className="grid grid-cols-2 gap-2 text-sm">

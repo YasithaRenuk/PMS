@@ -18,6 +18,17 @@ import {
     DialogTitle,
     DialogFooter,
 } from "@/components/ui/dialog";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -86,7 +97,7 @@ export function BranchManagement({ initialBranches }: { initialBranches: Branch[
     };
 
     const handleDelete = async (id: number) => {
-        if (!confirm("Are you sure you want to delete this branch?")) return;
+
 
         try {
             const res = await deleteBranch(id);
@@ -94,14 +105,14 @@ export function BranchManagement({ initialBranches }: { initialBranches: Branch[
             toast.success("Branch deleted successfully");
             router.refresh();
         } catch (err: any) {
-            alert(err.message);
+            toast.error(err.message || "Failed to delete branch");
         }
     };
 
     return (
         <>
             <div className="flex justify-end mb-6">
-                <Button onClick={handleOpenCreate} className="w-full md:w-auto">
+                <Button onClick={handleOpenCreate} className="w-full md:w-auto shadow-sm">
                     <Plus className="mr-2 h-4 w-4" />
                     Add New Branch
                 </Button>
@@ -124,7 +135,9 @@ export function BranchManagement({ initialBranches }: { initialBranches: Branch[
                             <TableRow key={branch.id}>
                                 <TableCell className="text-zinc-600">#{branch.id}</TableCell>
                                 <TableCell className="font-medium text-zinc-900">{branch.branch_name}</TableCell>
-                                <TableCell className="text-zinc-600">{branch.show_id}</TableCell>
+                                <TableCell className="text-zinc-600">
+                                    <Badge variant="outline" className="font-mono">{branch.show_id}</Badge>
+                                </TableCell>
                                 <TableCell className="text-zinc-500">{new Date(branch.createdAt).toLocaleDateString()}</TableCell>
                                 <TableCell className="text-right">
                                     <div className="flex items-center justify-end gap-2">
@@ -137,14 +150,31 @@ export function BranchManagement({ initialBranches }: { initialBranches: Branch[
                                                 >
                                                     <Pencil className="h-4 w-4" />
                                                 </Button>
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() => handleDelete(branch.id)}
-                                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                >
-                                                    <Trash className="h-4 w-4" />
-                                                </Button>
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                        >
+                                                            <Trash className="h-4 w-4" />
+                                                        </Button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                This action cannot be undone. This will permanently delete the branch and all associated data.
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                            <AlertDialogAction onClick={() => handleDelete(branch.id)} className="bg-red-500 hover:bg-red-600">
+                                                                Delete
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
                                             </>
                                         )}
                                         {branch.id === 1 && (
@@ -188,14 +218,31 @@ export function BranchManagement({ initialBranches }: { initialBranches: Branch[
                                         >
                                             <Pencil className="h-4 w-4" />
                                         </Button>
-                                        <Button
-                                            variant="outline"
-                                            size="icon"
-                                            className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                                            onClick={() => handleDelete(branch.id)}
-                                        >
-                                            <Trash className="h-4 w-4" />
-                                        </Button>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                >
+                                                    <Trash className="h-4 w-4" />
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        This action cannot be undone. This will permanently delete the branch.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                    <AlertDialogAction onClick={() => handleDelete(branch.id)} className="bg-red-500 hover:bg-red-600">
+                                                        Delete
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
                                     </>
                                 ) : (
                                     <Badge variant="secondary" className="italic text-[10px] text-zinc-400">Protected</Badge>
@@ -221,40 +268,47 @@ export function BranchManagement({ initialBranches }: { initialBranches: Branch[
                         <DialogTitle>{editingBranch ? "Edit Branch" : "Create New Branch"}</DialogTitle>
                     </DialogHeader>
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-6 py-4">
                         {error && (
                             <Alert variant="destructive">
                                 <AlertDescription>{error}</AlertDescription>
                             </Alert>
                         )}
 
-                        <div className="space-y-2">
-                            <Label htmlFor="branch_name">Branch Name</Label>
-                            <Input
-                                id="branch_name"
-                                value={formData.branch_name}
-                                onChange={(e) => setFormData({ ...formData, branch_name: e.target.value })}
-                                required
-                                placeholder="e.g. Main Branch"
-                            />
-                        </div>
+                        <div className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="branch_name">Branch Name</Label>
+                                <Input
+                                    id="branch_name"
+                                    value={formData.branch_name}
+                                    onChange={(e) => setFormData({ ...formData, branch_name: e.target.value })}
+                                    required
+                                    placeholder="e.g. Colombo Central"
+                                    className="bg-muted/30 focus:bg-background"
+                                />
+                            </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="show_id">Show ID</Label>
-                            <Input
-                                id="show_id"
-                                value={formData.show_id}
-                                onChange={(e) => setFormData({ ...formData, show_id: e.target.value })}
-                                required
-                                placeholder="e.g. BR-001"
-                            />
+                            <div className="space-y-2">
+                                <Label htmlFor="show_id">Show ID</Label>
+                                <Input
+                                    id="show_id"
+                                    value={formData.show_id}
+                                    onChange={(e) => setFormData({ ...formData, show_id: e.target.value })}
+                                    required
+                                    placeholder="e.g. BR-001"
+                                    className="bg-muted/30 focus:bg-background font-mono"
+                                />
+                                <p className="text-[0.8rem] text-muted-foreground">
+                                    Display ID used for internal reference.
+                                </p>
+                            </div>
                         </div>
 
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                                 Cancel
                             </Button>
-                            <Button type="submit" disabled={isLoading}>
+                            <Button type="submit" disabled={isLoading} className="shadow-sm">
                                 {isLoading ? "Saving..." : (editingBranch ? "Save Changes" : "Create Branch")}
                             </Button>
                         </DialogFooter>

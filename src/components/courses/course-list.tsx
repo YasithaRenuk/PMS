@@ -8,6 +8,8 @@ import { Role } from "@/app/generated/prisma/enums";
 import { useState } from "react";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 
 type Course = {
     id: number;
@@ -31,13 +33,12 @@ export function CourseList({ initialCourses, userRole }: CourseListProps) {
     // The server action calls revalidatePath, so router.refresh() should fetch new data.
 
     async function handleDelete(id: number) {
-        if (!confirm("Are you sure you want to delete this course?")) return;
-
         const result = await deleteCourse(id);
         if (result.success) {
+            toast.success("Course deleted successfully");
             router.refresh();
         } else {
-            alert(result.error);
+            toast.error(result.error || "Failed to delete course");
         }
     }
 
@@ -79,14 +80,31 @@ export function CourseList({ initialCourses, userRole }: CourseListProps) {
                                             }
                                             onSuccess={() => router.refresh()}
                                         />
-                                        <Button
-                                            variant="ghost"
-                                            size="icon"
-                                            className="text-red-500 hover:text-red-600"
-                                            onClick={() => handleDelete(course.id)}
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
+                                        <AlertDialog>
+                                            <AlertDialogTrigger asChild>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="text-red-500 hover:text-red-600"
+                                                >
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </AlertDialogTrigger>
+                                            <AlertDialogContent>
+                                                <AlertDialogHeader>
+                                                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                    <AlertDialogDescription>
+                                                        This action cannot be undone. This will permanently delete the course.
+                                                    </AlertDialogDescription>
+                                                </AlertDialogHeader>
+                                                <AlertDialogFooter>
+                                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                    <AlertDialogAction onClick={() => handleDelete(course.id)} className="bg-red-500 hover:bg-red-600">
+                                                        Delete
+                                                    </AlertDialogAction>
+                                                </AlertDialogFooter>
+                                            </AlertDialogContent>
+                                        </AlertDialog>
                                     </TableCell>
                                 )}
                             </TableRow>

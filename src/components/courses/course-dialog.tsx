@@ -67,12 +67,16 @@ export function CourseDialog({ course, trigger, open, onOpenChange, onSuccess }:
     return (
         <Dialog open={effectiveOpen} onOpenChange={setEffectiveOpen}>
             {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-            <DialogContent>
+            <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>{isEdit ? "Edit Course" : "Add Course"}</DialogTitle>
+                    <DialogTitle>{isEdit ? "Edit Course" : "Add New Course"}</DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    {error && <p className="text-red-500 text-sm">{error}</p>}
+                <form onSubmit={handleSubmit} className="space-y-6 py-4">
+                    {error && (
+                        <div className="p-3 bg-destructive/10 text-destructive text-sm rounded-md font-medium">
+                            {error}
+                        </div>
+                    )}
                     <div className="space-y-2">
                         <Label htmlFor="name">Course Name</Label>
                         <Input
@@ -80,25 +84,34 @@ export function CourseDialog({ course, trigger, open, onOpenChange, onSuccess }:
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             required
+                            placeholder="e.g. Mathematics"
+                            className="bg-muted/30 focus:bg-background"
                         />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="fee">Fee</Label>
-                        <Input
-                            id="fee"
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={fee}
-                            onChange={(e) => setFee(e.target.value)}
-                            required
-                        />
+                        <Label htmlFor="fee">Course Fee</Label>
+                        <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium">
+                                Rs.
+                            </span>
+                            <Input
+                                id="fee"
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                value={fee}
+                                onChange={(e) => setFee(e.target.value)}
+                                required
+                                className="pl-9 bg-muted/30 focus:bg-background"
+                                placeholder="0.00"
+                            />
+                        </div>
                     </div>
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-end gap-3 pt-2">
                         <Button type="button" variant="outline" onClick={() => setEffectiveOpen(false)}>
                             Cancel
                         </Button>
-                        <Button type="submit" disabled={loading}>
+                        <Button type="submit" disabled={loading} className="shadow-sm">
                             {loading ? "Saving..." : "Save"}
                         </Button>
                     </div>

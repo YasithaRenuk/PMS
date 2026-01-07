@@ -19,6 +19,17 @@ import {
     DialogTitle,
     DialogFooter,
 } from "@/components/ui/dialog";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -137,7 +148,8 @@ export function UserManagement({ initialUsers, branches, currentUser }: { initia
     };
 
     const handleDelete = async (id: number) => {
-        if (!confirm("Are you sure you want to delete this user?")) return;
+        // Confirmation is now handled by AlertDialog
+
 
         try {
             const res = await deleteUser(id);
@@ -145,7 +157,7 @@ export function UserManagement({ initialUsers, branches, currentUser }: { initia
             toast.success("User deleted successfully");
             router.refresh();
         } catch (err: any) {
-            alert(err.message);
+            toast.error(err.message || "Failed to delete user");
         }
     };
 
@@ -158,7 +170,7 @@ export function UserManagement({ initialUsers, branches, currentUser }: { initia
         <>
             <div className="flex justify-end mb-6">
                 {isSuperAdmin && (
-                    <Button onClick={handleOpenCreate}>
+                    <Button onClick={handleOpenCreate} className="shadow-sm">
                         <Plus className="mr-2 h-4 w-4" />
                         Add New User
                     </Button>
@@ -185,15 +197,15 @@ export function UserManagement({ initialUsers, branches, currentUser }: { initia
 
                             return (
                                 <TableRow key={user.id}>
-                                    <TableCell>#{user.id}</TableCell>
+                                    <TableCell className="text-zinc-600">#{user.id}</TableCell>
                                     <TableCell className="font-medium flex items-center gap-2">
                                         {user.username}
-                                        {user.id === 1 && <Badge variant="secondary" className="bg-amber-100 text-amber-700 hover:bg-amber-100">Super Admin</Badge>}
-                                        {isUserSelf && <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-100">You</Badge>}
+                                        {user.id === 1 && <Badge variant="secondary" className="bg-amber-100 text-amber-800 hover:bg-amber-200 border-amber-200">Super Admin</Badge>}
+                                        {isUserSelf && <Badge variant="secondary" className="bg-blue-100 text-blue-800 hover:bg-blue-200 border-blue-200">You</Badge>}
                                     </TableCell>
-                                    <TableCell className="capitalize">{user.role}</TableCell>
-                                    <TableCell>{user.branch?.branch_name || "-"}</TableCell>
-                                    <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+                                    <TableCell className="capitalize text-zinc-700">{user.role}</TableCell>
+                                    <TableCell className="text-zinc-600">{user.branch?.branch_name || "-"}</TableCell>
+                                    <TableCell className="text-zinc-500">{new Date(user.createdAt).toLocaleDateString()}</TableCell>
                                     <TableCell className="text-right">
                                         <div className="flex items-center justify-end gap-2">
                                             {showEdit && (
@@ -206,14 +218,31 @@ export function UserManagement({ initialUsers, branches, currentUser }: { initia
                                                 </Button>
                                             )}
                                             {showDelete && (
-                                                <Button
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    onClick={() => handleDelete(user.id)}
-                                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                                                >
-                                                    <Trash className="h-4 w-4" />
-                                                </Button>
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                                        >
+                                                            <Trash className="h-4 w-4" />
+                                                        </Button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                This action cannot be undone. This will permanently delete the user account.
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                            <AlertDialogAction onClick={() => handleDelete(user.id)} className="bg-red-500 hover:bg-red-600">
+                                                                Delete
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
                                             )}
                                         </div>
                                     </TableCell>
@@ -225,85 +254,96 @@ export function UserManagement({ initialUsers, branches, currentUser }: { initia
             </div>
 
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-                <DialogContent>
+                <DialogContent className="sm:max-w-[500px]">
                     <DialogHeader>
                         <DialogTitle>{editingUser ? "Edit User" : "Create New User"}</DialogTitle>
                     </DialogHeader>
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                    <form onSubmit={handleSubmit} className="space-y-6 py-4">
                         {error && (
                             <Alert variant="destructive">
                                 <AlertDescription>{error}</AlertDescription>
                             </Alert>
                         )}
 
-                        <div className="space-y-2">
-                            <Label htmlFor="username">Username</Label>
-                            <Input
-                                id="username"
-                                value={formData.username}
-                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                                required
-                            />
-                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2 col-span-2 sm:col-span-1">
+                                <Label htmlFor="username">Username</Label>
+                                <Input
+                                    id="username"
+                                    value={formData.username}
+                                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                                    required
+                                    placeholder="johndoe"
+                                    className="bg-muted/30 focus:bg-background"
+                                />
+                            </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="password">
-                                Password {editingUser && <span className="text-zinc-500 font-normal text-xs ml-2">(Leave blank to keep current)</span>}
-                            </Label>
-                            <Input
-                                id="password"
-                                type="password"
-                                value={formData.password}
-                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                required={!editingUser}
-                            />
-                        </div>
+                            <div className="space-y-2 col-span-2 sm:col-span-1">
+                                <Label htmlFor="password">
+                                    Password {editingUser && <span className="text-zinc-500 font-normal text-xs">(Optional)</span>}
+                                </Label>
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    value={formData.password}
+                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                    required={!editingUser}
+                                    placeholder="••••••••"
+                                    className="bg-muted/30 focus:bg-background"
+                                />
+                            </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="role">Role</Label>
-                            <Select
-                                disabled={!canEditRoleAndBranch}
-                                value={formData.role}
-                                onValueChange={(val) => setFormData({ ...formData, role: val as Role })}
-                            >
-                                <SelectTrigger className="bg-white">
-                                    <SelectValue placeholder="Select a role" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value={Role.admin}>Admin</SelectItem>
-                                    <SelectItem value={Role.superAdmin}>Super Admin</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            {!canEditRoleAndBranch && isSuperAdmin && <p className="text-xs text-amber-600">Locked for Super Admin (ID 1)</p>}
-                            {!isSuperAdmin && <p className="text-xs text-zinc-500">You cannot change your role.</p>}
-                        </div>
+                            <div className="space-y-2 col-span-2">
+                                <Label htmlFor="role">Role</Label>
+                                <Select
+                                    disabled={!canEditRoleAndBranch}
+                                    value={formData.role}
+                                    onValueChange={(val) => setFormData({ ...formData, role: val as Role })}
+                                >
+                                    <SelectTrigger className="bg-muted/30 focus:bg-background">
+                                        <SelectValue placeholder="Select a role" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value={Role.admin}>Admin</SelectItem>
+                                        <SelectItem value={Role.superAdmin}>Super Admin</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                {canEditRoleAndBranch && (
+                                    <p className="text-[0.8rem] text-muted-foreground">
+                                        Super Admins have full access. Admins are restricted to their branch.
+                                    </p>
+                                )}
+                                {!canEditRoleAndBranch && isSuperAdmin && <p className="text-xs text-amber-600">Locked for Super Admin (ID 1)</p>}
+                                {!isSuperAdmin && <p className="text-xs text-zinc-500">You cannot change your role.</p>}
+                            </div>
 
-                        <div className="space-y-2">
-                            <Label htmlFor="branch">Assigned Branch</Label>
-                            <Select
-                                disabled={!canEditRoleAndBranch}
-                                value={formData.branchId}
-                                onValueChange={(val) => setFormData({ ...formData, branchId: val })}
-                            >
-                                <SelectTrigger className="bg-white">
-                                    <SelectValue placeholder="Select a branch" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {branches.map(b => (
-                                        <SelectItem key={b.id} value={b.id.toString()}>{b.branch_name}</SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
-                            {!canEditRoleAndBranch && isSuperAdmin && <p className="text-xs text-amber-600">Locked for Super Admin (ID 1)</p>}
-                            {!isSuperAdmin && <p className="text-xs text-zinc-500">You cannot change your branch.</p>}
+                            <div className="space-y-2 col-span-2">
+                                <Label htmlFor="branch">Assigned Branch</Label>
+                                <Select
+                                    disabled={!canEditRoleAndBranch}
+                                    value={formData.branchId}
+                                    onValueChange={(val) => setFormData({ ...formData, branchId: val })}
+                                >
+                                    <SelectTrigger className="bg-muted/30 focus:bg-background">
+                                        <SelectValue placeholder="Select a branch" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {branches.map(b => (
+                                            <SelectItem key={b.id} value={b.id.toString()}>{b.branch_name}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {!canEditRoleAndBranch && isSuperAdmin && <p className="text-xs text-amber-600">Locked for Super Admin (ID 1)</p>}
+                                {!isSuperAdmin && <p className="text-xs text-zinc-500">You cannot change your branch.</p>}
+                            </div>
                         </div>
 
                         <DialogFooter>
                             <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                                 Cancel
                             </Button>
-                            <Button type="submit" disabled={isLoading}>
+                            <Button type="submit" disabled={isLoading} className="shadow-sm">
                                 {isLoading ? "Saving..." : (editingUser ? "Save Changes" : "Create User")}
                             </Button>
                         </DialogFooter>

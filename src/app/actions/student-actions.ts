@@ -108,9 +108,84 @@ export async function createStudent(data: {
     if (!data.courseIds || data.courseIds.length === 0) {
         throw new Error("At least one course is required");
     }
-    
-    // Check if student with same unique identifiers exists (optional logic but DB will throw)
-    // Here we let DB throw unique constraint violation if full_name is duplicate (as requested)
+
+    // Check for existing student with same full_name
+    const existingStudent = await prisma.student.findUnique({
+        where: { full_name: data.full_name } 
+    });
+
+    if (existingStudent) {
+        if (existingStudent.deletedAt) {
+             // Restore logic
+             const restored = await prisma.$transaction(async (tx) => {
+                 const student = await tx.student.update({
+                     where: { id: existingStudent.id },
+                     data: {
+                         deletedAt: null,
+                         phone_number: data.phone_number,
+                         student_id: data.student_id,
+                         branchId: branchId!,
+                     }
+                 });
+
+                 // Update enrollments
+                 // First verify if we need to clean up old enrollments
+                 // Simplest: Delete all existing enrollments for this student (hard delete or soft delete, here hard delete to reset state is easier)
+                 // But wait, enrollments might have history. 
+                 // Let's just create new ones that don't exist and soft-delete/restore others.
+                 
+                 // Strategy:
+                 // 1. Fetch current enrollments
+                 // 2. Add new ones
+                 // 3. Restore soft-deleted ones if in list
+                 // 4. Soft-delete ones NOT in list
+                 
+                 const currentEnrollments = await tx.enrollment.findMany({
+                     where: { studentId: student.id }
+                 });
+                 const oldCourseIds = currentEnrollments.map(e => e.courseId);
+                 
+                 const toAdd = data.courseIds.filter(cid => !oldCourseIds.includes(cid));
+                 const toRestore = data.courseIds.filter(cid => oldCourseIds.includes(cid)); // These are in both, ensure they are active
+                 const toRemove = oldCourseIds.filter(cid => !data.courseIds.includes(cid));
+                 
+                 if (toAdd.length > 0) {
+                     await tx.enrollment.createMany({
+                         data: toAdd.map(cid => ({
+                             studentId: student.id,
+                             courseId: cid
+                         }))
+                     });
+                 }
+                 
+                 if (toRestore.length > 0) {
+                     await tx.enrollment.updateMany({
+                         where: {
+                             studentId: student.id,
+                             courseId: { in: toRestore }
+                         },
+                         data: { deletedAt: null }
+                     });
+                 }
+                 
+                 if (toRemove.length > 0) {
+                     await tx.enrollment.updateMany({
+                         where: {
+                             studentId: student.id,
+                             courseId: { in: toRemove }
+                         },
+                         data: { deletedAt: new Date() }
+                     });
+                 }
+
+                 return student;
+             });
+             revalidatePath("/students");
+             return { success: true, data: restored };
+        } else {
+             return { success: false, error: "Student with this name already exists." };
+        }
+    }
     
     // Create student with enrollments transactions
     const student = await prisma.$transaction(async (tx) => {

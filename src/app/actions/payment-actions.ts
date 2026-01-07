@@ -336,12 +336,82 @@ export async function getPaymentReports(filters?: {
         formattedCourseTotals = formattedCourseTotals.sort((a, b) => b.total - a.total);
     }
 
+    // --- New Logic: Student Metrics ---
+
+    // 1. Build Student Filter
+    const studentWhereInput: any = { deletedAt: null };
+    if (filters?.branchId) {
+        studentWhereInput.branchId = filters.branchId;
+    }
+    if (filters?.courseId) {
+        studentWhereInput.enrollments = {
+            some: {
+                courseId: filters.courseId,
+                deletedAt: null
+            }
+        };
+    }
+
+    // 2. Total Students
+    const totalStudents = await prisma.student.count({
+        where: studentWhereInput
+    });
+
+    // 3. Fully Paid Students
+    // We need to fetch students to calculate their financial status
+    const students = await prisma.student.findMany({
+        where: studentWhereInput,
+        include: {
+            enrollments: {
+                where: { deletedAt: null },
+                include: { course: true }
+            },
+            payments: {
+                where: { deletedAt: null }
+            }
+        }
+    });
+
+    let fullyPaidStudents = 0;
+    let totalOutstanding = 0;
+
+    students.forEach(student => {
+        // Calculate Total Fees
+        let totalFees = 0;
+        student.enrollments.forEach(enrollment => {
+           // If a specific course filter is applied, we might arguably only care about THAT course's fees.
+           // However, "Outstanding Balance" is usually a student-level concept (owing money to the institute).
+           // If I filter by Course A, seeing that a student owes money for Course B might be relevant or distracting.
+           // Stick to the "Global" outstanding for the students IN this view for now, as it's safer than under-reporting debt.
+           // Or, to be consistent with "Filtered Revenue", maybe we should try to attribute? 
+           // But debt is hard to attribute to a specific course if partially paid without specific allocation.
+           // Let's stick to: "Total debt of students who match the current filter".
+           totalFees += enrollment.course.fee;
+        });
+
+        // Calculate Total Paid
+        const totalPaid = student.payments.reduce((sum, p) => sum + p.fee, 0);
+
+        if (totalPaid >= totalFees && totalFees > 0) { 
+            fullyPaidStudents++;
+        }
+        
+        // Calculate Outstanding
+        if (totalFees > totalPaid) {
+            totalOutstanding += (totalFees - totalPaid);
+        }
+    });
+
+
     return {
       success: true,
       data: {
-        totalRevenue: Math.round(totalRevenue * 100) / 100, // Round to 2 decimals
+        totalRevenue: Math.round(totalRevenue * 100) / 100,
         branchTotals: formattedBranchTotals,
         courseTotals: formattedCourseTotals,
+        totalStudents,
+        fullyPaidStudents,
+        totalOutstanding: Math.round(totalOutstanding * 100) / 100
       }
     };
 

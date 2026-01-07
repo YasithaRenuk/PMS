@@ -27,7 +27,31 @@ export async function createUser(data: CreateUserData & { password: string }) {
   }
 
   try {
+    const existingUser = await prisma.user.findUnique({
+        where: { username: data.username },
+    });
+
     const hashedPassword = await hash(data.password, 12);
+
+    if (existingUser) {
+        if (existingUser.deletedAt) {
+            // Restore user
+             const restored = await prisma.user.update({
+                where: { id: existingUser.id },
+                data: {
+                    deletedAt: null,
+                    password: hashedPassword,
+                    role: data.role,
+                    branchId: data.branchId,
+                }
+            });
+            revalidatePath("/dashboard/branch-admins");
+            return { success: true, data: restored };
+        } else {
+             return { success: false, error: "Username already exists." };
+        }
+    }
+
     const user = await prisma.user.create({
       data: {
         username: data.username,

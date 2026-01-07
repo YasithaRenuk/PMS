@@ -5,7 +5,7 @@ import { Role } from "@/app/generated/prisma/enums";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { DollarSign, Building2, BookOpen } from "lucide-react";
+import { DollarSign, Building2, BookOpen, User, CheckCircle, Clock } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { ReportFilters } from "@/components/report-filters";
 
@@ -100,87 +100,52 @@ export default async function ReportsPage(props: {
 
                 <Card accent className="bg-primary/5 shadow-md border-zinc-200">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
-                        <CardTitle className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Active Branches in View</CardTitle>
-                        <div className="p-2 bg-blue-50 rounded-lg">
-                            <Building2 className="h-5 w-5 text-blue-600" />
+                        <CardTitle className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Outstanding Balance</CardTitle>
+                        <div className="p-2 bg-amber-50 rounded-lg">
+                            <Clock className="h-5 w-5 text-amber-600" />
                         </div>
                     </CardHeader>
                     <CardContent className="pt-4">
-                        <div className="text-4xl font-bold text-zinc-900">{reports.branchTotals.length}</div>
+                        <div className="text-4xl font-bold text-zinc-900">{formatCurrency(reports.totalOutstanding)}</div>
                         <div className="mt-4 flex items-center gap-2">
-                            <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-none px-2 py-0 text-[10px] font-bold uppercase transition-none">Active</Badge>
-                            <p className="text-xs text-zinc-500">Collecting revenue</p>
+                            <Badge variant="secondary" className="bg-amber-100 text-amber-700 hover:bg-amber-100 border-none px-2 py-0 text-[10px] font-bold uppercase transition-none">Pending</Badge>
+                            <p className="text-xs text-zinc-500">To be collected</p>
                         </div>
                     </CardContent>
                 </Card>
             </div>
 
-            <div className="grid gap-8 md:grid-cols-2">
-                <Card className="bg-primary/5 shadow-md border-zinc-200">
-                    <CardHeader className="border-b border-zinc-50 pb-4">
-                        <CardTitle className="text-lg font-bold flex items-center gap-3 text-zinc-800">
-                            <div className="p-2 bg-zinc-100 rounded-lg">
-                                <Building2 className="h-5 w-5 text-zinc-600" />
-                            </div>
-                            Branch-wise Revenue
-                        </CardTitle>
+            {/* Student Metrics */}
+            <div className="grid gap-6 md:grid-cols-2">
+                <Card accent className="bg-primary/5 shadow-md border-zinc-200">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Total Students</CardTitle>
+                        <div className="p-2 bg-indigo-50 rounded-lg">
+                            <User className="h-5 w-5 text-indigo-600" />
+                        </div>
                     </CardHeader>
-                    <CardContent className="pt-2">
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="hover:bg-transparent border-zinc-100">
-                                    <TableHead className="font-bold text-zinc-900">Branch Name</TableHead>
-                                    <TableHead className="text-right font-bold text-zinc-900">Total Revenue</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {reports.branchTotals.map((branch: any) => (
-                                    <TableRow key={branch.name} className="border-zinc-50 hover:bg-zinc-50/50 transition-colors">
-                                        <TableCell className="font-medium text-zinc-700">{branch.name}</TableCell>
-                                        <TableCell className="text-right font-bold text-primary">{formatCurrency(branch.total)}</TableCell>
-                                    </TableRow>
-                                ))}
-                                {reports.branchTotals.length === 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={2} className="text-center text-zinc-400 py-10">No data available for filters</TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
+                    <CardContent className="pt-4">
+                        <div className="text-4xl font-bold text-zinc-900">{reports.totalStudents}</div>
+                        <div className="mt-4 flex items-center gap-2">
+                            <Badge variant="secondary" className="bg-indigo-100 text-indigo-700 hover:bg-indigo-100 border-none px-2 py-0 text-[10px] font-bold uppercase transition-none">Enrolled</Badge>
+                            <p className="text-xs text-zinc-500">In selected scope</p>
+                        </div>
                     </CardContent>
                 </Card>
 
-                <Card className="bg-primary/5 shadow-md border-zinc-200">
-                    <CardHeader className="border-b border-zinc-50 pb-4">
-                        <CardTitle className="text-lg font-bold flex items-center gap-3 text-zinc-800">
-                            <div className="p-2 bg-zinc-100 rounded-lg">
-                                <BookOpen className="h-5 w-5 text-zinc-600" />
-                            </div>
-                            Course-wise Revenue
-                        </CardTitle>
+                <Card accent className="bg-primary/5 shadow-md border-zinc-200">
+                    <CardHeader className="flex flex-row items-center justify-between pb-2">
+                        <CardTitle className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Fully Paid Students</CardTitle>
+                        <div className="p-2 bg-emerald-50 rounded-lg">
+                            <CheckCircle className="h-5 w-5 text-emerald-600" />
+                        </div>
                     </CardHeader>
-                    <CardContent className="pt-2">
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="hover:bg-transparent border-zinc-100">
-                                    <TableHead className="font-bold text-zinc-900">Course Name</TableHead>
-                                    <TableHead className="text-right font-bold text-zinc-900">Total Revenue</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {reports.courseTotals.map((course: any) => (
-                                    <TableRow key={course.name} className="border-zinc-50 hover:bg-zinc-50/50 transition-colors">
-                                        <TableCell className="font-medium text-zinc-700">{course.name}</TableCell>
-                                        <TableCell className="text-right font-bold text-primary">{formatCurrency(course.total)}</TableCell>
-                                    </TableRow>
-                                ))}
-                                {reports.courseTotals.length === 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={2} className="text-center text-zinc-400 py-10">No data available for filters</TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
+                    <CardContent className="pt-4">
+                        <div className="text-4xl font-bold text-zinc-900">{reports.fullyPaidStudents}</div>
+                        <div className="mt-4 flex items-center gap-2">
+                            <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none px-2 py-0 text-[10px] font-bold uppercase transition-none">Completed</Badge>
+                            <p className="text-xs text-zinc-500">Full tuition paid</p>
+                        </div>
                     </CardContent>
                 </Card>
             </div>

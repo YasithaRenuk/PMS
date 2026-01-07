@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getServerAuthSession } from "@/lib/auth";
 import { Role } from "@/app/generated/prisma/enums";
 import { revalidatePath } from "next/cache";
+import { sendSMS } from "@/lib/sms";
 
 export async function getStudentPaymentSummary(studentId: number) {
   try {
@@ -142,6 +143,21 @@ export async function createPayment(data: {
     });
 
     revalidatePath("/dashboard/students");
+
+    // Send SMS msg to student
+    try {
+      const formattedDate = now.toISOString().split('T')[0];
+      const message = `Payment Received: LKR ${data.amount} has been successfully recorded in the system on ${formattedDate} at ${timeString}.`;
+      
+      // Run in background to not block response? calling await here for reliability as per user request flow implies they want to know it happened or just simple flow.
+      // User's example had return await fetch, but here we are in a server action returning data object.
+      // We will await it to ensure it sends before returning success, or check errors.
+      // However, we shouldn't fail the payment if SMS fails? Usually not.
+      await sendSMS(student.phone_number, message);
+    } catch (smsError) {
+      console.error("Failed to send SMS:", smsError);
+    }
+
     return { success: true, data: payment };
   } catch (error) {
     console.error("Caught error in createPayment:", error);

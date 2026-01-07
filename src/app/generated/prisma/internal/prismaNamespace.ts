@@ -900,6 +900,7 @@ export const PaymentScalarFieldEnum = {
   time: 'time',
   studentId: 'studentId',
   userId: 'userId',
+  sms_status: 'sms_status',
   deletedAt: 'deletedAt'
 } as const
 
@@ -1010,6 +1011,13 @@ export type EnumRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+/**
+ * Reference to a field of type 'Boolean'
+ */
+export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 /**

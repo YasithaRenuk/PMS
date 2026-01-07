@@ -153,7 +153,24 @@ export async function createPayment(data: {
       // User's example had return await fetch, but here we are in a server action returning data object.
       // We will await it to ensure it sends before returning success, or check errors.
       // However, we shouldn't fail the payment if SMS fails? Usually not.
-      await sendSMS(student.phone_number, message);
+      const smsResponse = await sendSMS(student.phone_number, message);
+
+      let isSuccess = false;
+      try {
+        const parsed = JSON.parse(smsResponse);
+        if (parsed.status === "success") {
+          isSuccess = true;
+        }
+      } catch (parseError) {
+        console.error("Failed to parse SMS response:", parseError);
+      }
+
+      if (isSuccess) {
+        await prisma.payment.update({
+          where: { id: payment.id },
+          data: { sms_status: true },
+        });
+      }
     } catch (smsError) {
       console.error("Failed to send SMS:", smsError);
     }

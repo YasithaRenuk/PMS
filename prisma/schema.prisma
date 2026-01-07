@@ -66,6 +66,7 @@ model Payment {
   student        Student   @relation(fields: [studentId], references: [id])
   userId         Int
   user           User      @relation(fields: [userId], references: [id])
+  sms_status     Boolean   @default(false)
   deletedAt      DateTime?
 }
 

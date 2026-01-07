@@ -131,6 +131,7 @@ export const PaymentScalarFieldEnum = {
   time: 'time',
   studentId: 'studentId',
   userId: 'userId',
+  sms_status: 'sms_status',
   deletedAt: 'deletedAt'
 } as const
 

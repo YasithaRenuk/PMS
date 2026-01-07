@@ -7,6 +7,7 @@ import {
   SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -68,7 +69,7 @@ export function AppSidebar() {
   const items = session.user.role === Role.superAdmin ? superAdmin_Items : admin_Items;
 
   return (
-    <Sidebar className="border-r border-zinc-200">
+    <Sidebar className="border-r border-zinc-200 ">
       <SidebarHeader className="p-4">
         <div className="flex items-center gap-3 px-2">
           <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20 shrink-0 transform transition-transform group-data-[state=collapsed]:scale-90">
@@ -87,6 +88,7 @@ export function AppSidebar() {
 
       <SidebarContent className="px-4 py-2">
         <SidebarGroup>
+          <SidebarGroupLabel>MAIN MENU</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="gap-2">
               {items.map((item) => {
@@ -100,14 +102,14 @@ export function AppSidebar() {
                       className={cn(
                         "h-11 px-4 transition-all duration-200 rounded-lg group/btn",
                         isActive
-                          ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90 hover:text-primary-foreground"
+                          ? "bg-white text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90 hover:text-primary-foreground"
                           : "text-zinc-600 hover:bg-zinc-100 hover:text-primary"
                       )}
                     >
                       <Link href={item.url} className="flex items-center gap-3 w-full">
                         <item.icon className={cn(
                           "w-5 h-5 transition-colors",
-                          isActive ? "text-primary-foreground" : "text-zinc-50/50 group-hover/btn:text-primary"
+                          isActive ? "text-black" : "group-hover/btn:text-primary"
                         )} />
                         <span className="font-medium">{item.title}</span>
                         {isActive && (
@@ -150,12 +152,6 @@ export function AppSidebar() {
                 <div className="px-2 py-1.5 mb-2">
                   <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">My Account</p>
                 </div>
-                <DropdownMenuItem className="rounded-lg focus:bg-zinc-50 cursor-pointer group/item py-2">
-                  <Link href="/dashboard/settings" className="flex items-center gap-2 w-full">
-                    <Settings className="w-4 h-4 text-zinc-400 group-hover/item:text-zinc-900" />
-                    <span className="font-medium">Settings</span>
-                  </Link>
-                </DropdownMenuItem>
                 <div className="h-px bg-zinc-100 my-1 mx-[-0.5rem]" />
                 <DropdownMenuItem className="rounded-lg focus:bg-red-50 cursor-pointer group/logout py-2">
                   <div className="flex items-center gap-2 w-full text-red-600">
@@ -168,6 +164,7 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+      
     </Sidebar>
   );
 }

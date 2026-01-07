@@ -128,8 +128,8 @@ export function StudentList({ students, branches, courses, userRole }: StudentLi
             </div>
 
             <div className="flex flex-col md:flex-row gap-4">
-                <div className="relative flex-1">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <div className="relative flex-1 bg-white rounded-full">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground " />
                     <Input
                         type="search"
                         placeholder="Search by Name, ID, or Phone..."

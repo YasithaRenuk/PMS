@@ -82,7 +82,7 @@ export default async function ReportsPage(props: {
 
             {/* Overview Card */}
             <div className="grid gap-6 md:grid-cols-2">
-                <Card accent className="bg-primary/5 shadow-md border-zinc-200">
+                <Card accent className="bg-white shadow-md border-zinc-200">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Filtered Revenue</CardTitle>
                         <div className="p-2 bg-green-50 rounded-lg">
@@ -98,7 +98,7 @@ export default async function ReportsPage(props: {
                     </CardContent>
                 </Card>
 
-                <Card accent className="bg-primary/5 shadow-md border-zinc-200">
+                <Card accent className="bg-white shadow-md border-zinc-200">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Outstanding Balance</CardTitle>
                         <div className="p-2 bg-amber-50 rounded-lg">
@@ -117,7 +117,7 @@ export default async function ReportsPage(props: {
 
             {/* Student Metrics */}
             <div className="grid gap-6 md:grid-cols-2">
-                <Card accent className="bg-primary/5 shadow-md border-zinc-200">
+                <Card accent className="bg-white shadow-md border-zinc-200">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Total Students</CardTitle>
                         <div className="p-2 bg-indigo-50 rounded-lg">
@@ -133,7 +133,7 @@ export default async function ReportsPage(props: {
                     </CardContent>
                 </Card>
 
-                <Card accent className="bg-primary/5 shadow-md border-zinc-200">
+                <Card accent className="bg-white shadow-md border-zinc-200">
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
                         <CardTitle className="text-sm font-semibold uppercase tracking-wider text-zinc-500">Fully Paid Students</CardTitle>
                         <div className="p-2 bg-emerald-50 rounded-lg">

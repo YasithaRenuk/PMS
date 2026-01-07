@@ -2,22 +2,28 @@ import "dotenv/config";
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 import bcrypt from 'bcryptjs';
 import { PrismaClient, Role } from "@/app/generated/prisma/client";
+import { PrismaTiDBCloud } from "@tidbcloud/prisma-adapter";
 
 if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL is not set in environment variables.");
 }
 
-const adapter = new PrismaMariaDb({
-  host: process.env.TIDB_HOST,
-  user: process.env.TIDB_USER,
-  password: process.env.TIDB_PASSWORD,
-  database: process.env.TIDB_DATABASE,
-  port: process.env.TIDB_PORT ? Number(process.env.TIDB_PORT) : 4000,
-  connectionLimit: 5,
-  ssl: {
-    rejectUnauthorized: true, 
-  },
+// const adapter = new PrismaMariaDb({
+//   host: process.env.TIDB_HOST,
+//   user: process.env.TIDB_USER,
+//   password: process.env.TIDB_PASSWORD,
+//   database: process.env.TIDB_DATABASE,
+//   port: process.env.TIDB_PORT ? Number(process.env.TIDB_PORT) : 4000,
+//   connectionLimit: 5,
+//   ssl: {
+//     rejectUnauthorized: true, 
+//   },
+// });
+
+const adapter = new PrismaTiDBCloud({
+  url: process.env.DATABASE_URL
 });
+
 
 const prisma = new PrismaClient({ adapter });
 

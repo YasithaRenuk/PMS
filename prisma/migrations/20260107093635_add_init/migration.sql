@@ -57,6 +57,7 @@ CREATE TABLE `Payment` (
     `time` VARCHAR(191) NOT NULL,
     `studentId` INTEGER NOT NULL,
     `userId` INTEGER NOT NULL,
+    `sms_status` BOOLEAN NOT NULL DEFAULT false,
     `deletedAt` DATETIME(3) NULL,
 
     PRIMARY KEY (`id`)

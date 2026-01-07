@@ -435,6 +435,7 @@ export async function getPaymentReports(filters?: {
         }
     });
 
+
     return {
       success: true,
       data: {
@@ -452,104 +453,3 @@ export async function getPaymentReports(filters?: {
     return { success: false, error: "Failed to fetch reports" };
   }
 }
-
-
-export async function getFailedSmsPayments() {
-  try {
-    const session = await getServerAuthSession();
-    if (!session) {
-      throw new Error("Unauthorized");
-    }
-
-    const failedPayments = await prisma.payment.findMany({
-      where: {
-        sms_status: false,
-        deletedAt: null,
-      },
-      include: {
-        student: {
-            select: {
-                full_name: true,
-                phone_number: true,
-            }
-        }
-      },
-      orderBy: {
-        date: "desc",
-      },
-    });
-
-    return { success: true, data: failedPayments };
-  } catch (error) {
-    console.error("Failed to get failed SMS payments:", error);
-    return { success: false, error: "Failed to fetch failed SMS payments" };
-  }
-}
-
-export async function retrySms(paymentIds: number[]) {
-  try {
-    const session = await getServerAuthSession();
-    if (!session) {
-      throw new Error("Unauthorized");
-    }
-
-    const results = {
-      successCount: 0,
-      failCount: 0,
-      errors: [] as string[]
-    };
-
-    const payments = await prisma.payment.findMany({
-      where: {
-        id: { in: paymentIds },
-        sms_status: false,
-        deletedAt: null 
-      },
-      include: {
-        student: true
-      }
-    });
-
-    for (const payment of payments) {
-      try {
-        const dateObj = new Date(payment.date);
-        const formattedDate = dateObj.toISOString().split('T')[0];
-        const message = `Payment Received: LKR ${payment.fee} has been successfully recorded in the system on ${formattedDate} at ${payment.time}.`;
-        
-        const smsResponse = await sendSMS(payment.student.phone_number, message);
-        
-        let isSuccess = false;
-        try {
-            const parsed = JSON.parse(smsResponse);
-            if (parsed.status === "success") {
-                isSuccess = true;
-            }
-        } catch (e) {
-            console.error("Error parsing SMS response during retry:", e);
-        }
-
-        if (isSuccess) {
-            await prisma.payment.update({
-                where: { id: payment.id },
-                data: { sms_status: true }
-            });
-            results.successCount++;
-        } else {
-            results.failCount++;
-        }
-
-      } catch (err) {
-        console.error(`Failed to retry SMS for payment ${payment.id}:`, err);
-        results.failCount++;
-        results.errors.push(`Payment ${payment.id}: ${String(err)}`);
-      }
-    }
-
-    return { success: true, data: results };
-
-  } catch (error) {
-    console.error("Failed to retry SMS batch:", error);
-    return { success: false, error: "Failed to process retry request" };
-  }
-}
-

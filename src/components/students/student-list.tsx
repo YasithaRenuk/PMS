@@ -14,6 +14,7 @@ import { Pencil, Trash2, Search, DollarSign, Eye, Plus } from "lucide-react";
 import { useState, useCallback } from "react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
+import { RetrySmsButton } from "./retry-sms-button";
 
 // Helper for debounce if library not present (assuming I should check but standard to have one)
 // But to avoid install, I'll use a simple custom hook or plain timeout for now if use-debounce isn't there.
@@ -115,7 +116,8 @@ export function StudentList({ students, branches, courses, userRole }: StudentLi
 
     return (
         <div className="space-y-4">
-            <div className="flex justify-end items-center">
+            <div className="flex justify-end items-center gap-2">
+                <RetrySmsButton />
                 <StudentDialog
                     courses={courses}
                     branches={branches}

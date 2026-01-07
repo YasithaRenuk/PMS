@@ -122,17 +122,4 @@
   body {
     @apply bg-background text-foreground;
   }
-  html {
-    scroll-behavior: smooth;
-  }
-}
-
-@layer utilities {
-  .glass {
-    @apply bg-white/70 dark:bg-black/70 backdrop-blur-md border border-white/20 dark:border-white/10;
-  }
-  
-  .glass-card {
-    @apply bg-card/80 backdrop-blur-sm border-white/20 dark:border-white/10 shadow-lg;
-  }
 }

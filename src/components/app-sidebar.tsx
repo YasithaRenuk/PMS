@@ -1,6 +1,7 @@
 "use client";
 
 import { Clipboard, GitBranch, LibraryBig, LogOut, Settings, ShieldUser, User } from "lucide-react";
+import { motion } from "framer-motion";
 import {
   Sidebar,
   SidebarContent,
@@ -12,6 +13,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { Role } from "@/app/generated/prisma/enums";
 import { SignOutButton } from "./sign-out-button";
@@ -67,6 +69,7 @@ export function AppSidebar() {
   }
 
   const items = session.user.role === Role.superAdmin ? superAdmin_Items : admin_Items;
+  const { isMobile, setOpenMobile } = useSidebar();
 
   return (
     <Sidebar className="border-r border-zinc-200 ">
@@ -91,35 +94,62 @@ export function AppSidebar() {
           <SidebarGroupLabel>MAIN MENU</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="gap-2">
-              {items.map((item) => {
-                const isActive = pathname === item.url;
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isActive}
-                      tooltip={item.title}
-                      className={cn(
-                        "h-11 px-4 transition-all duration-200 rounded-lg group/btn",
-                        isActive
-                          ? "bg-white text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90 hover:text-primary-foreground"
-                          : "text-zinc-600 hover:bg-zinc-100 hover:text-primary"
-                      )}
+              <motion.div
+                initial="hidden"
+                animate="show"
+                variants={{
+                  hidden: { opacity: 0 },
+                  show: {
+                    opacity: 1,
+                    transition: {
+                      staggerChildren: 0.1
+                    }
+                  }
+                }}
+              >
+                {items.map((item) => {
+                  const isActive = pathname === item.url;
+                  return (
+                    <motion.div
+                      key={item.title}
+                      variants={{
+                        hidden: { opacity: 0, x: -20 },
+                        show: { opacity: 1, x: 0 }
+                      }}
                     >
-                      <Link href={item.url} className="flex items-center gap-3 w-full">
-                        <item.icon className={cn(
-                          "w-5 h-5 transition-colors",
-                          isActive ? "text-black" : "group-hover/btn:text-primary"
-                        )} />
-                        <span className="font-medium">{item.title}</span>
-                        {isActive && (
-                          <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-foreground/40 shadow-sm" />
-                        )}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
+                      <SidebarMenuItem>
+                        <SidebarMenuButton
+                          asChild
+                          isActive={isActive}
+                          tooltip={item.title}
+                          className={cn(
+                            "h-11 px-4 transition-all duration-200 rounded-lg group/btn",
+                            isActive
+                              ? "bg-white text-primary-foreground shadow-md shadow-primary/20 hover:bg-primary/90 hover:text-primary-foreground"
+                              : "text-zinc-600 hover:bg-zinc-100 hover:text-primary"
+                          )}
+                          onClick={() => {
+                            if (isMobile) {
+                              setOpenMobile(false);
+                            }
+                          }}
+                        >
+                          <Link href={item.url} className="flex items-center gap-3 w-full">
+                            <item.icon className={cn(
+                              "w-5 h-5 transition-colors",
+                              isActive ? "text-black" : "group-hover/btn:text-primary"
+                            )} />
+                            <span className="font-medium">{item.title}</span>
+                            {isActive && (
+                              <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-foreground/40 shadow-sm" />
+                            )}
+                          </Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    </motion.div>
+                  );
+                })}
+              </motion.div>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -164,7 +194,7 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-      
+
     </Sidebar>
   );
 }

@@ -35,6 +35,7 @@ CREATE TABLE `Student` (
     `deletedAt` DATETIME(3) NULL,
 
     UNIQUE INDEX `Student_full_name_key`(`full_name`),
+    UNIQUE INDEX `Student_student_id_key`(`student_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

@@ -37,7 +37,7 @@ export function SystemFeeList() {
         setLoading(false);
     }
 
-    async function handleDelete() {
+    async function handleDelete(id: number) {
         if (deleteId === null) return;
         setIsDeleting(true);
         const result = await deleteSystemFee(deleteId);

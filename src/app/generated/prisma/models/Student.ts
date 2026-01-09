@@ -249,17 +249,17 @@ export type StudentOrderByWithRelationInput = {
 export type StudentWhereUniqueInput = Prisma.AtLeast<{
   id?: number
   full_name?: string
+  student_id?: string
   AND?: Prisma.StudentWhereInput | Prisma.StudentWhereInput[]
   OR?: Prisma.StudentWhereInput[]
   NOT?: Prisma.StudentWhereInput | Prisma.StudentWhereInput[]
   phone_number?: Prisma.StringFilter<"Student"> | string
-  student_id?: Prisma.StringFilter<"Student"> | string
   branchId?: Prisma.IntFilter<"Student"> | number
   deletedAt?: Prisma.DateTimeNullableFilter<"Student"> | Date | string | null
   enrollments?: Prisma.EnrollmentListRelationFilter
   payments?: Prisma.PaymentListRelationFilter
   branch?: Prisma.XOR<Prisma.BranchScalarRelationFilter, Prisma.BranchWhereInput>
-}, "id" | "full_name">
+}, "id" | "full_name" | "student_id">
 
 export type StudentOrderByWithAggregationInput = {
   id?: Prisma.SortOrder

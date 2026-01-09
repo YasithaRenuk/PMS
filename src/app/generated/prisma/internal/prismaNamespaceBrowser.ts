@@ -55,6 +55,8 @@ export const ModelName = {
   User: 'User',
   Student: 'Student',
   Course: 'Course',
+  CourseFee: 'CourseFee',
+  SystemFee: 'SystemFee',
   Payment: 'Payment',
   Enrollment: 'Enrollment'
 } as const
@@ -116,11 +118,35 @@ export type StudentScalarFieldEnum = (typeof StudentScalarFieldEnum)[keyof typeo
 export const CourseScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  fee: 'fee',
   deletedAt: 'deletedAt'
 } as const
 
 export type CourseScalarFieldEnum = (typeof CourseScalarFieldEnum)[keyof typeof CourseScalarFieldEnum]
+
+
+export const CourseFeeScalarFieldEnum = {
+  id: 'id',
+  courseId: 'courseId',
+  type: 'type',
+  fee: 'fee',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type CourseFeeScalarFieldEnum = (typeof CourseFeeScalarFieldEnum)[keyof typeof CourseFeeScalarFieldEnum]
+
+
+export const SystemFeeScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  amount: 'amount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type SystemFeeScalarFieldEnum = (typeof SystemFeeScalarFieldEnum)[keyof typeof SystemFeeScalarFieldEnum]
 
 
 export const PaymentScalarFieldEnum = {
@@ -131,6 +157,9 @@ export const PaymentScalarFieldEnum = {
   time: 'time',
   studentId: 'studentId',
   userId: 'userId',
+  courseId: 'courseId',
+  courseFeeId: 'courseFeeId',
+  systemFeeId: 'systemFeeId',
   sms_status: 'sms_status',
   deletedAt: 'deletedAt'
 } as const
@@ -194,6 +223,20 @@ export const CourseOrderByRelevanceFieldEnum = {
 } as const
 
 export type CourseOrderByRelevanceFieldEnum = (typeof CourseOrderByRelevanceFieldEnum)[keyof typeof CourseOrderByRelevanceFieldEnum]
+
+
+export const CourseFeeOrderByRelevanceFieldEnum = {
+  type: 'type'
+} as const
+
+export type CourseFeeOrderByRelevanceFieldEnum = (typeof CourseFeeOrderByRelevanceFieldEnum)[keyof typeof CourseFeeOrderByRelevanceFieldEnum]
+
+
+export const SystemFeeOrderByRelevanceFieldEnum = {
+  name: 'name'
+} as const
+
+export type SystemFeeOrderByRelevanceFieldEnum = (typeof SystemFeeOrderByRelevanceFieldEnum)[keyof typeof SystemFeeOrderByRelevanceFieldEnum]
 
 
 export const PaymentOrderByRelevanceFieldEnum = {

@@ -16,6 +16,11 @@ export async function getCourses() {
       where: {
         deletedAt: null,
       },
+      include: {
+        fees: {
+          where: { deletedAt: null }
+        }
+      },
       orderBy: {
         name: "asc",
       },
@@ -28,7 +33,10 @@ export async function getCourses() {
   }
 }
 
-export async function createCourse(data: { name: string; fee: number }) {
+export async function createCourse(data: { 
+  name: string; 
+  fees: { type: string; fee: number }[] 
+}) {
   try {
     const session = await getServerAuthSession();
     if (!session || session.user.role !== Role.superAdmin) {
@@ -38,8 +46,16 @@ export async function createCourse(data: { name: string; fee: number }) {
     const course = await prisma.course.create({
       data: {
         name: data.name,
-        fee: data.fee,
+        fees: {
+          create: data.fees.map(f => ({
+            type: f.type,
+            fee: f.fee
+          }))
+        }
       },
+      include: {
+        fees: true
+      }
     });
 
     revalidatePath("/courses");
@@ -50,19 +66,58 @@ export async function createCourse(data: { name: string; fee: number }) {
   }
 }
 
-export async function updateCourse(id: number, data: { name: string; fee: number }) {
+export async function updateCourse(
+  id: number, 
+  data: { 
+    name: string; 
+    fees: { id?: number; type: string; fee: number; isDeleted?: boolean }[] 
+  }
+) {
   try {
     const session = await getServerAuthSession();
     if (!session || session.user.role !== Role.superAdmin) {
       throw new Error("Unauthorized");
     }
 
-    const course = await prisma.course.update({
-      where: { id },
-      data: {
-        name: data.name,
-        fee: data.fee,
-      },
+    // Use a transaction to update course and its fees
+    const course = await prisma.$transaction(async (tx) => {
+      // 1. Update course name
+      const updatedCourse = await tx.course.update({
+        where: { id },
+        data: { name: data.name },
+      });
+
+      // 2. Handle fees
+      for (const feeData of data.fees) {
+        if (feeData.isDeleted && feeData.id) {
+            // Soft delete
+            await tx.courseFee.update({
+                where: { id: feeData.id },
+                data: { deletedAt: new Date() }
+            });
+        } else if (feeData.id) {
+          // Update existing fee
+          await tx.courseFee.update({
+            where: { id: feeData.id },
+            data: {
+              type: feeData.type,
+              fee: feeData.fee,
+              deletedAt: null // Ensure it's not deleted if being updated
+            },
+          });
+        } else {
+          // Create new fee
+          await tx.courseFee.create({
+            data: {
+              courseId: id,
+              type: feeData.type,
+              fee: feeData.fee,
+            },
+          });
+        }
+      }
+
+      return updatedCourse;
     });
 
     revalidatePath("/courses");

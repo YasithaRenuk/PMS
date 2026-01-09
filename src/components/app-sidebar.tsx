@@ -1,6 +1,6 @@
 "use client";
 
-import { Clipboard, GitBranch, LibraryBig, LogOut, Settings, ShieldUser, User } from "lucide-react";
+import { Clipboard, GitBranch, Globe, LibraryBig, LogOut, Settings, ShieldUser, User } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -50,6 +50,11 @@ const superAdmin_Items = [
     title: "Branch Admins",
     url: "/dashboard/branch-admins",
     icon: ShieldUser,
+  },
+  {
+    title: "General Fees",
+    url: "/dashboard/fees",
+    icon: Globe,
   },
   {
     title: "Reports",
@@ -164,7 +169,7 @@ export function AppSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-      
+
     </Sidebar>
   );
 }

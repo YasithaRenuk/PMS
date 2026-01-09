@@ -13,6 +13,11 @@ export async function getStudentPaymentSummary(studentId: number) {
       throw new Error("Unauthorized");
     }
 
+    // Get all system fees
+    const systemFees = await prisma.systemFee.findMany({
+        where: { deletedAt: null }
+    });
+
     // Get student with enrollments and payments
     const student = await prisma.student.findUnique({
       where: { id: studentId, deletedAt: null },
@@ -20,7 +25,13 @@ export async function getStudentPaymentSummary(studentId: number) {
         enrollments: {
           where: { deletedAt: null },
           include: {
-            course: true,
+            course: {
+              include: {
+                fees: {
+                  where: { deletedAt: null }
+                }
+              }
+            },
           },
         },
         payments: {
@@ -41,10 +52,16 @@ export async function getStudentPaymentSummary(studentId: number) {
       }
     }
 
-    // Calculate total fees from enrolled courses
-    const totalFees = student.enrollments.reduce((sum, enrollment) => {
-      return sum + enrollment.course.fee;
+    // Calculate total fees from enrolled courses (summing all fee types)
+    const totalCourseFees = student.enrollments.reduce((sum, enrollment) => {
+      const courseFees = enrollment.course.fees.reduce((fSum, f) => fSum + f.fee, 0);
+      return sum + courseFees;
     }, 0);
+
+    // Calculate total system fees
+    const totalSystemFees = systemFees.reduce((sum, f) => sum + f.amount, 0);
+
+    const totalFees = totalCourseFees + totalSystemFees;
 
     // Calculate total paid amount
     const totalPaid = student.payments.reduce((sum, payment) => {
@@ -63,9 +80,37 @@ export async function getStudentPaymentSummary(studentId: number) {
         totalPaid,
         remainingBalance,
         enrolledCourses: student.enrollments.map(e => ({
+          courseId: e.course.id,
           courseName: e.course.name,
-          fee: e.course.fee,
+          fee: e.course.fees.reduce((sum, f) => sum + f.fee, 0),
+          feeBreakdown: e.course.fees.map(f => {
+            // Find payments for this specific fee type
+            const paidForThisFee = student.payments
+              .filter(p => p.courseFeeId === f.id)
+              .reduce((sum, p) => sum + p.fee, 0);
+            
+            return { 
+              id: f.id, 
+              type: f.type, 
+              fee: f.fee,
+              paid: paidForThisFee,
+              remaining: f.fee - paidForThisFee
+            };
+          })
         })),
+        systemFees: systemFees.map(f => {
+            const paidForThisFee = student.payments
+                .filter(p => p.systemFeeId === f.id)
+                .reduce((sum, p) => sum + p.fee, 0);
+            
+            return {
+                id: f.id,
+                name: f.name,
+                amount: f.amount,
+                paid: paidForThisFee,
+                remaining: f.amount - paidForThisFee
+            };
+        })
       },
     };
   } catch (error) {
@@ -78,6 +123,9 @@ export async function createPayment(data: {
   studentId: number;
   amount: number;
   paymentMethod: string;
+  courseId?: number;
+  courseFeeId?: number;
+  systemFeeId?: number;
 }) {
   try {
     const session = await getServerAuthSession();
@@ -139,6 +187,9 @@ export async function createPayment(data: {
         date: now,
         time: timeString,
         userId: userId,
+        courseId: data.courseId,
+        courseFeeId: data.courseFeeId,
+        systemFeeId: data.systemFeeId,
       },
     });
 
@@ -147,12 +198,27 @@ export async function createPayment(data: {
     // Send SMS msg to student
     try {
       const formattedDate = now.toISOString().split('T')[0];
-      const message = `Payment Received: LKR ${data.amount} has been successfully recorded in the system on ${formattedDate} at ${timeString}.`;
       
-      // Run in background to not block response? calling await here for reliability as per user request flow implies they want to know it happened or just simple flow.
-      // User's example had return await fetch, but here we are in a server action returning data object.
-      // We will await it to ensure it sends before returning success, or check errors.
-      // However, we shouldn't fail the payment if SMS fails? Usually not.
+      let feeTypeLabel = "";
+      if (data.courseFeeId) {
+          const feeDetail = await prisma.courseFee.findUnique({
+              where: { id: data.courseFeeId },
+              include: { course: true }
+          });
+          if (feeDetail) {
+              feeTypeLabel = ` for ${feeDetail.course.name} (${feeDetail.type})`;
+          }
+      } else if (data.systemFeeId) {
+          const systemFee = await prisma.systemFee.findUnique({
+              where: { id: data.systemFeeId }
+          });
+          if (systemFee) {
+              feeTypeLabel = ` for ${systemFee.name}`;
+          }
+      }
+
+      const message = `Payment Received: LKR ${data.amount} has been successfully recorded${feeTypeLabel} on ${formattedDate} at ${timeString}.`;
+      
       const smsResponse = await sendSMS(student.phone_number, message);
 
       let isSuccess = false;
@@ -213,6 +279,9 @@ export async function getStudentPayments(studentId: number) {
         deletedAt: null,
       },
       include: {
+        course: true,
+        courseFee: true,
+        systemFee: true,
         user: {
           select: {
             id: true,
@@ -291,13 +360,21 @@ export async function getPaymentReports(filters?: {
     const allPayments = await prisma.payment.findMany({
       where,
       include: {
+        course: true, // Include course info for direct link aggregation
+        systemFee: true,
         student: {
           include: {
             branch: true,
             enrollments: {
               where: { deletedAt: null },
               include: {
-                course: true
+                course: {
+                  include: {
+                    fees: {
+                      where: { deletedAt: null }
+                    }
+                  }
+                }
               }
             }
           }
@@ -317,31 +394,53 @@ export async function getPaymentReports(filters?: {
     allPayments.forEach(payment => {
       const amount = payment.fee;
       
-      // Course Aggregation (Proportional distribution)
-      const enrollments = payment.student.enrollments;
-      const totalStudentFees = enrollments.reduce((sum, e) => sum + e.course.fee, 0);
-
-      let attributedToFilteredCourse = 0;
-      if (totalStudentFees > 0) {
-        enrollments.forEach(enrollment => {
-          const courseName = enrollment.course.name;
-          const proportion = enrollment.course.fee / totalStudentFees;
-          const attributedAmount = amount * proportion;
+      // Course Aggregation
+      // If the payment is directly linked to a course, use that.
+      // Otherwise, use the old proportional logic for legacy data.
+      if (payment.courseId) {
+          const courseName = payment.course?.name || "Unknown Course";
+          courseTotals[courseName] = (courseTotals[courseName] || 0) + amount;
           
-          courseTotals[courseName] = (courseTotals[courseName] || 0) + attributedAmount;
-          
-          if (filters?.courseId === enrollment.courseId) {
-             attributedToFilteredCourse = attributedAmount;
+          if (filters?.courseId && payment.courseId === filters.courseId) {
+              totalRevenue += amount;
+          } else if (!filters?.courseId) {
+              totalRevenue += amount;
           }
-        });
-      }
-
-      // If filtering by course, total revenue is only what's attributed to that course
-      // Otherwise it's the full payment amount
-      if (filters?.courseId) {
-        totalRevenue += attributedToFilteredCourse;
+      } else if (payment.systemFeeId) {
+          const feeName = payment.systemFee?.name || "System Fee";
+          courseTotals[feeName] = (courseTotals[feeName] || 0) + amount;
+          
+          if (!filters?.courseId) {
+              totalRevenue += amount;
+          }
       } else {
-        totalRevenue += amount;
+          // Old Proportional Distribution for legacy payments
+          const enrollments = payment.student.enrollments;
+          const totalStudentFees = enrollments.reduce((sum: number, e: any) => {
+            return sum + e.course.fees.reduce((fSum: number, f: any) => fSum + f.fee, 0);
+          }, 0);
+
+          let attributedToFilteredCourse = 0;
+          if (totalStudentFees > 0) {
+            enrollments.forEach((enrollment: any) => {
+              const courseName = enrollment.course.name;
+              const courseTotalFee = enrollment.course.fees.reduce((fSum: number, f: any) => fSum + f.fee, 0);
+              const proportion = courseTotalFee / totalStudentFees;
+              const attributedAmount = amount * proportion;
+              
+              courseTotals[courseName] = (courseTotals[courseName] || 0) + attributedAmount;
+              
+              if (filters?.courseId === enrollment.courseId) {
+                 attributedToFilteredCourse = attributedAmount;
+              }
+            });
+          }
+
+          if (filters?.courseId) {
+            totalRevenue += attributedToFilteredCourse;
+          } else {
+            totalRevenue += amount;
+          }
       }
 
       // Branch Aggregation
@@ -397,7 +496,15 @@ export async function getPaymentReports(filters?: {
         include: {
             enrollments: {
                 where: { deletedAt: null },
-                include: { course: true }
+                include: { 
+                    course: {
+                        include: {
+                            fees: {
+                                where: { deletedAt: null }
+                            }
+                        }
+                    } 
+                }
             },
             payments: {
                 where: { deletedAt: null }
@@ -408,30 +515,43 @@ export async function getPaymentReports(filters?: {
     let fullyPaidStudents = 0;
     let totalOutstanding = 0;
 
+    // Fetch system fees for global metrics
+    const systemFees = await prisma.systemFee.findMany({ where: { deletedAt: null } });
+    const totalSystemFeesAmount = systemFees.reduce((sum, f) => sum + f.amount, 0);
+
     students.forEach(student => {
-        // Calculate Total Fees
         let totalFees = 0;
-        student.enrollments.forEach(enrollment => {
-           // If a specific course filter is applied, we might arguably only care about THAT course's fees.
-           // However, "Outstanding Balance" is usually a student-level concept (owing money to the institute).
-           // If I filter by Course A, seeing that a student owes money for Course B might be relevant or distracting.
-           // Stick to the "Global" outstanding for the students IN this view for now, as it's safer than under-reporting debt.
-           // Or, to be consistent with "Filtered Revenue", maybe we should try to attribute? 
-           // But debt is hard to attribute to a specific course if partially paid without specific allocation.
-           // Let's stick to: "Total debt of students who match the current filter".
-           totalFees += enrollment.course.fee;
-        });
+        let totalPaid = 0;
 
-        // Calculate Total Paid
-        const totalPaid = student.payments.reduce((sum, p) => sum + p.fee, 0);
+        if (filters?.courseId) {
+            // Metrics for a specific course
+            const courseEnrollment = student.enrollments.find(e => e.courseId === filters.courseId);
+            if (courseEnrollment) {
+                totalFees = courseEnrollment.course.fees.reduce((fSum, f) => fSum + f.fee, 0);
+                
+                // Sum payments specifically for this course or its fees
+                totalPaid = student.payments
+                    .filter(p => p.courseId === filters.courseId || (p.courseFeeId && courseEnrollment.course.fees.some(f => f.id === p.courseFeeId)))
+                    .reduce((sum, p) => sum + p.fee, 0);
+            }
+        } else {
+            // Global metrics (all courses + system fees)
+            student.enrollments.forEach((enrollment: any) => {
+               totalFees += enrollment.course.fees.reduce((fSum: number, f: any) => fSum + f.fee, 0);
+            });
+            totalFees += totalSystemFeesAmount;
 
-        if (totalPaid >= totalFees && totalFees > 0) { 
-            fullyPaidStudents++;
+            totalPaid = student.payments.reduce((sum, p) => sum + p.fee, 0);
         }
-        
-        // Calculate Outstanding
-        if (totalFees > totalPaid) {
-            totalOutstanding += (totalFees - totalPaid);
+
+        // Only count students who belong to the selected scope (already filtered by studentWhereInput)
+        if (totalFees > 0) {
+            if (totalPaid >= totalFees) {
+                fullyPaidStudents++;
+            }
+            if (totalFees > totalPaid) {
+                totalOutstanding += (totalFees - totalPaid);
+            }
         }
     });
 

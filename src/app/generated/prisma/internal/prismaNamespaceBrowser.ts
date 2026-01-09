@@ -55,6 +55,7 @@ export const ModelName = {
   User: 'User',
   Student: 'Student',
   Course: 'Course',
+  CourseFee: 'CourseFee',
   Payment: 'Payment',
   Enrollment: 'Enrollment'
 } as const
@@ -116,11 +117,23 @@ export type StudentScalarFieldEnum = (typeof StudentScalarFieldEnum)[keyof typeo
 export const CourseScalarFieldEnum = {
   id: 'id',
   name: 'name',
-  fee: 'fee',
   deletedAt: 'deletedAt'
 } as const
 
 export type CourseScalarFieldEnum = (typeof CourseScalarFieldEnum)[keyof typeof CourseScalarFieldEnum]
+
+
+export const CourseFeeScalarFieldEnum = {
+  id: 'id',
+  courseId: 'courseId',
+  type: 'type',
+  fee: 'fee',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type CourseFeeScalarFieldEnum = (typeof CourseFeeScalarFieldEnum)[keyof typeof CourseFeeScalarFieldEnum]
 
 
 export const PaymentScalarFieldEnum = {
@@ -194,6 +207,13 @@ export const CourseOrderByRelevanceFieldEnum = {
 } as const
 
 export type CourseOrderByRelevanceFieldEnum = (typeof CourseOrderByRelevanceFieldEnum)[keyof typeof CourseOrderByRelevanceFieldEnum]
+
+
+export const CourseFeeOrderByRelevanceFieldEnum = {
+  type: 'type'
+} as const
+
+export type CourseFeeOrderByRelevanceFieldEnum = (typeof CourseFeeOrderByRelevanceFieldEnum)[keyof typeof CourseFeeOrderByRelevanceFieldEnum]
 
 
 export const PaymentOrderByRelevanceFieldEnum = {

@@ -28,7 +28,11 @@ export function PaymentDialog({ studentId, studentName, trigger, onSuccess }: Pa
         totalFees: number;
         totalPaid: number;
         remainingBalance: number;
-        enrolledCourses: { courseName: string; fee: number }[];
+        enrolledCourses: {
+            courseName: string;
+            fee: number;
+            feeBreakdown: { type: string; fee: number }[];
+        }[];
     } | null>(null);
 
     // Load payment summary when dialog opens
@@ -121,11 +125,21 @@ export function PaymentDialog({ studentId, studentName, trigger, onSuccess }: Pa
                                 {summary.enrolledCourses.length > 0 && (
                                     <div className="space-y-2">
                                         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Courses</p>
-                                        <ul className="text-sm space-y-1">
+                                        <ul className="text-sm space-y-3">
                                             {summary.enrolledCourses.map((course, idx) => (
-                                                <li key={idx} className="flex justify-between items-center group">
-                                                    <span className="text-zinc-700">{course.courseName}</span>
-                                                    <span className="font-mono text-zinc-500">Rs. {course.fee.toFixed(2)}</span>
+                                                <li key={idx} className="space-y-1 group border-b border-muted pb-2 last:border-0 last:pb-0">
+                                                    <div className="flex justify-between items-center text-zinc-800 font-medium">
+                                                        <span>{course.courseName}</span>
+                                                        <span className="font-mono">Rs. {course.fee.toFixed(2)}</span>
+                                                    </div>
+                                                    <div className="flex flex-col gap-1 pl-3 border-l-2 border-muted/50">
+                                                        {course.feeBreakdown.map((f, fIdx) => (
+                                                            <div key={fIdx} className="flex justify-between text-[11px] text-zinc-500">
+                                                                <span>{f.type}</span>
+                                                                <span className="font-mono">Rs. {f.fee.toFixed(2)}</span>
+                                                            </div>
+                                                        ))}
+                                                    </div>
                                                 </li>
                                             ))}
                                         </ul>

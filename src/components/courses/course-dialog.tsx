@@ -11,7 +11,18 @@ import { toast } from "sonner";
 type Course = {
     id: number;
     name: string;
-    fee: number;
+    fees: {
+        id: number;
+        type: string;
+        fee: number;
+    }[];
+};
+
+type FeeItem = {
+    id?: number;
+    type: string;
+    fee: string;
+    isDeleted?: boolean;
 };
 
 interface CourseDialogProps {
@@ -24,7 +35,10 @@ interface CourseDialogProps {
 
 export function CourseDialog({ course, trigger, open, onOpenChange, onSuccess }: CourseDialogProps) {
     const [name, setName] = useState(course?.name || "");
-    const [fee, setFee] = useState(course?.fee?.toString() || "");
+    const [fees, setFees] = useState<FeeItem[]>(
+        course?.fees?.map(f => ({ id: f.id, type: f.type, fee: f.fee.toString() })) ||
+        [{ type: "Entrance Fee", fee: "" }]
+    );
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [internalOpen, setInternalOpen] = useState(false);
@@ -39,12 +53,27 @@ export function CourseDialog({ course, trigger, open, onOpenChange, onSuccess }:
         setError("");
 
         try {
-            const feeNumber = parseFloat(fee);
-            if (isNaN(feeNumber)) throw new Error("Invalid fee");
+            const formattedFees = fees
+                .filter(f => !f.isDeleted)
+                .map(f => {
+                    const feeNumber = parseFloat(f.fee);
+                    if (isNaN(feeNumber)) throw new Error(`Invalid fee for ${f.type}`);
+                    return { ...f, fee: feeNumber };
+                });
+
+            if (formattedFees.length === 0) {
+                throw new Error("At least one fee is required");
+            }
+
+            // Include deleted fees in update
+            const finalFees = [
+                ...formattedFees,
+                ...fees.filter(f => f.isDeleted && f.id).map(f => ({ ...f, fee: parseFloat(f.fee) || 0 }))
+            ];
 
             const result = isEdit
-                ? await updateCourse(course.id, { name, fee: feeNumber })
-                : await createCourse({ name, fee: feeNumber });
+                ? await updateCourse(course.id, { name, fees: finalFees })
+                : await createCourse({ name, fees: formattedFees });
 
             if (!result.success) {
                 throw new Error(result.error || "Failed to save course");
@@ -55,7 +84,7 @@ export function CourseDialog({ course, trigger, open, onOpenChange, onSuccess }:
             if (onSuccess) onSuccess();
             if (!isEdit) {
                 setName("");
-                setFee("");
+                setFees([{ type: "Entrance Fee", fee: "" }]);
             }
         } catch (err: any) {
             setError(err.message);
@@ -63,6 +92,26 @@ export function CourseDialog({ course, trigger, open, onOpenChange, onSuccess }:
             setLoading(false);
         }
     }
+
+    const addFee = () => {
+        setFees([...fees, { type: "", fee: "" }]);
+    };
+
+    const removeFee = (index: number) => {
+        const newFees = [...fees];
+        if (newFees[index].id) {
+            newFees[index].isDeleted = true;
+        } else {
+            newFees.splice(index, 1);
+        }
+        setFees(newFees);
+    };
+
+    const updateFee = (index: number, field: keyof FeeItem, value: string) => {
+        const newFees = [...fees];
+        newFees[index] = { ...newFees[index], [field]: value };
+        setFees(newFees);
+    };
 
     return (
         <Dialog open={effectiveOpen} onOpenChange={setEffectiveOpen}>
@@ -88,24 +137,55 @@ export function CourseDialog({ course, trigger, open, onOpenChange, onSuccess }:
                             className="bg-muted/30 focus:bg-background"
                         />
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="fee">Course Fee</Label>
-                        <div className="relative">
-                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm font-medium">
-                                Rs.
-                            </span>
-                            <Input
-                                id="fee"
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                value={fee}
-                                onChange={(e) => setFee(e.target.value)}
-                                required
-                                className="pl-9 bg-muted/30 focus:bg-background"
-                                placeholder="0.00"
-                            />
+                    <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                            <Label>Fees</Label>
+                            <Button type="button" variant="outline" size="sm" onClick={addFee}>
+                                Add Fee
+                            </Button>
                         </div>
+                        {fees.filter(f => !f.isDeleted).map((feeItem, index) => {
+                            // Find actual index in state
+                            const actualIndex = fees.indexOf(feeItem);
+                            return (
+                                <div key={actualIndex} className="flex gap-2 items-start bg-muted/20 p-3 rounded-lg relative group">
+                                    <div className="flex-1 space-y-2">
+                                        <Input
+                                            placeholder="Fee Type (e.g. Monthly Fee)"
+                                            value={feeItem.type}
+                                            onChange={(e) => updateFee(actualIndex, 'type', e.target.value)}
+                                            required
+                                            className="h-8 text-sm"
+                                        />
+                                        <div className="relative">
+                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-medium">
+                                                Rs.
+                                            </span>
+                                            <Input
+                                                type="number"
+                                                min="0"
+                                                step="0.01"
+                                                value={feeItem.fee}
+                                                onChange={(e) => updateFee(actualIndex, 'fee', e.target.value)}
+                                                required
+                                                placeholder="0.00"
+                                                className="pl-9 h-8 text-sm"
+                                            />
+                                        </div>
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                                        onClick={() => removeFee(actualIndex)}
+                                        disabled={fees.filter(f => !f.isDeleted).length <= 1}
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg>
+                                    </Button>
+                                </div>
+                            );
+                        })}
                     </div>
                     <div className="flex justify-end gap-3 pt-2">
                         <Button type="button" variant="outline" onClick={() => setEffectiveOpen(false)}>

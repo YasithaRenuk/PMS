@@ -20,7 +20,13 @@ export async function getStudentPaymentSummary(studentId: number) {
         enrollments: {
           where: { deletedAt: null },
           include: {
-            course: true,
+            course: {
+              include: {
+                fees: {
+                  where: { deletedAt: null }
+                }
+              }
+            },
           },
         },
         payments: {
@@ -41,9 +47,10 @@ export async function getStudentPaymentSummary(studentId: number) {
       }
     }
 
-    // Calculate total fees from enrolled courses
+    // Calculate total fees from enrolled courses (summing all fee types)
     const totalFees = student.enrollments.reduce((sum, enrollment) => {
-      return sum + enrollment.course.fee;
+      const courseFees = enrollment.course.fees.reduce((fSum, f) => fSum + f.fee, 0);
+      return sum + courseFees;
     }, 0);
 
     // Calculate total paid amount
@@ -64,7 +71,8 @@ export async function getStudentPaymentSummary(studentId: number) {
         remainingBalance,
         enrolledCourses: student.enrollments.map(e => ({
           courseName: e.course.name,
-          fee: e.course.fee,
+          fee: e.course.fees.reduce((sum, f) => sum + f.fee, 0),
+          feeBreakdown: e.course.fees.map(f => ({ type: f.type, fee: f.fee }))
         })),
       },
     };
@@ -297,7 +305,13 @@ export async function getPaymentReports(filters?: {
             enrollments: {
               where: { deletedAt: null },
               include: {
-                course: true
+                course: {
+                  include: {
+                    fees: {
+                      where: { deletedAt: null }
+                    }
+                  }
+                }
               }
             }
           }
@@ -319,13 +333,16 @@ export async function getPaymentReports(filters?: {
       
       // Course Aggregation (Proportional distribution)
       const enrollments = payment.student.enrollments;
-      const totalStudentFees = enrollments.reduce((sum, e) => sum + e.course.fee, 0);
+      const totalStudentFees = enrollments.reduce((sum: number, e: any) => {
+        return sum + e.course.fees.reduce((fSum: number, f: any) => fSum + f.fee, 0);
+      }, 0);
 
       let attributedToFilteredCourse = 0;
       if (totalStudentFees > 0) {
-        enrollments.forEach(enrollment => {
+        enrollments.forEach((enrollment: any) => {
           const courseName = enrollment.course.name;
-          const proportion = enrollment.course.fee / totalStudentFees;
+          const courseTotalFee = enrollment.course.fees.reduce((fSum: number, f: any) => fSum + f.fee, 0);
+          const proportion = courseTotalFee / totalStudentFees;
           const attributedAmount = amount * proportion;
           
           courseTotals[courseName] = (courseTotals[courseName] || 0) + attributedAmount;
@@ -397,7 +414,15 @@ export async function getPaymentReports(filters?: {
         include: {
             enrollments: {
                 where: { deletedAt: null },
-                include: { course: true }
+                include: { 
+                    course: {
+                        include: {
+                            fees: {
+                                where: { deletedAt: null }
+                            }
+                        }
+                    } 
+                }
             },
             payments: {
                 where: { deletedAt: null }
@@ -411,15 +436,8 @@ export async function getPaymentReports(filters?: {
     students.forEach(student => {
         // Calculate Total Fees
         let totalFees = 0;
-        student.enrollments.forEach(enrollment => {
-           // If a specific course filter is applied, we might arguably only care about THAT course's fees.
-           // However, "Outstanding Balance" is usually a student-level concept (owing money to the institute).
-           // If I filter by Course A, seeing that a student owes money for Course B might be relevant or distracting.
-           // Stick to the "Global" outstanding for the students IN this view for now, as it's safer than under-reporting debt.
-           // Or, to be consistent with "Filtered Revenue", maybe we should try to attribute? 
-           // But debt is hard to attribute to a specific course if partially paid without specific allocation.
-           // Let's stick to: "Total debt of students who match the current filter".
-           totalFees += enrollment.course.fee;
+        student.enrollments.forEach((enrollment: any) => {
+           totalFees += enrollment.course.fees.reduce((fSum: number, f: any) => fSum + f.fee, 0);
         });
 
         // Calculate Total Paid

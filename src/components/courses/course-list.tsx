@@ -14,7 +14,11 @@ import { toast } from "sonner";
 type Course = {
     id: number;
     name: string;
-    fee: number;
+    fees: {
+        id: number;
+        type: string;
+        fee: number;
+    }[];
 };
 
 interface CourseListProps {
@@ -68,7 +72,20 @@ export function CourseList({ initialCourses, userRole }: CourseListProps) {
                         {initialCourses.map((course) => (
                             <TableRow key={course.id}>
                                 <TableCell className="font-medium">{course.name}</TableCell>
-                                <TableCell>{course.fee.toFixed(2)}</TableCell>
+                                <TableCell>
+                                    <div className="flex flex-col">
+                                        <span className="font-semibold text-primary">
+                                            Rs. {course.fees.reduce((sum, f) => sum + f.fee, 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </span>
+                                        <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-1">
+                                            {course.fees.map((fee) => (
+                                                <span key={fee.id} className="text-[10px] bg-muted/50 px-1.5 py-0.5 rounded text-muted-foreground whitespace-nowrap">
+                                                    {fee.type}: {fee.fee.toLocaleString()}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </TableCell>
                                 {canManage && (
                                     <TableCell className="flex gap-2">
                                         <CourseDialog

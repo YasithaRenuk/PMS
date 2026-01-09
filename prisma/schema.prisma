@@ -51,9 +51,20 @@ model Student {
 model Course {
   id          Int          @id @default(autoincrement())
   name        String
-  fee         Float
+  fees        CourseFee[]
   enrollments Enrollment[]
   deletedAt   DateTime?
+}
+
+model CourseFee {
+  id        Int      @id @default(autoincrement())
+  courseId  Int
+  course    Course   @relation(fields: [courseId], references: [id])
+  type      String   // e.g. entrance fee, monthly fee, cloth fee
+  fee       Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 }
 
 model Payment {

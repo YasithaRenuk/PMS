@@ -60,6 +60,11 @@ export type Student = Prisma.StudentModel
  */
 export type Course = Prisma.CourseModel
 /**
+ * Model CourseFee
+ * 
+ */
+export type CourseFee = Prisma.CourseFeeModel
+/**
  * Model Payment
  * 
  */

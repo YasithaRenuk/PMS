@@ -73,7 +73,20 @@ export async function getStudentPaymentSummary(studentId: number) {
           courseId: e.course.id,
           courseName: e.course.name,
           fee: e.course.fees.reduce((sum, f) => sum + f.fee, 0),
-          feeBreakdown: e.course.fees.map(f => ({ id: f.id, type: f.type, fee: f.fee }))
+          feeBreakdown: e.course.fees.map(f => {
+            // Find payments for this specific fee type
+            const paidForThisFee = student.payments
+              .filter(p => p.courseFeeId === f.id)
+              .reduce((sum, p) => sum + p.fee, 0);
+            
+            return { 
+              id: f.id, 
+              type: f.type, 
+              fee: f.fee,
+              paid: paidForThisFee,
+              remaining: f.fee - paidForThisFee
+            };
+          })
         })),
       },
     };
@@ -160,12 +173,20 @@ export async function createPayment(data: {
     // Send SMS msg to student
     try {
       const formattedDate = now.toISOString().split('T')[0];
-      const message = `Payment Received: LKR ${data.amount} has been successfully recorded in the system on ${formattedDate} at ${timeString}.`;
       
-      // Run in background to not block response? calling await here for reliability as per user request flow implies they want to know it happened or just simple flow.
-      // User's example had return await fetch, but here we are in a server action returning data object.
-      // We will await it to ensure it sends before returning success, or check errors.
-      // However, we shouldn't fail the payment if SMS fails? Usually not.
+      let feeTypeLabel = "";
+      if (data.courseFeeId) {
+          const feeDetail = await prisma.courseFee.findUnique({
+              where: { id: data.courseFeeId },
+              include: { course: true }
+          });
+          if (feeDetail) {
+              feeTypeLabel = ` for ${feeDetail.course.name} (${feeDetail.type})`;
+          }
+      }
+
+      const message = `Payment Received: LKR ${data.amount} has been successfully recorded${feeTypeLabel} on ${formattedDate} at ${timeString}.`;
+      
       const smsResponse = await sendSMS(student.phone_number, message);
 
       let isSuccess = false;

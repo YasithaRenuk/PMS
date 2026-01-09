@@ -9,6 +9,8 @@ import { createCourse, updateCourse } from "@/app/actions/course-actions";
 import { toast } from "sonner";
 import { FEE_TYPES } from "@/lib/constants";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { BookOpen, Plus, Trash2, AlertCircle, Loader2, IndianRupee } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type Course = {
     id: number;
@@ -118,92 +120,149 @@ export function CourseDialog({ course, trigger, open, onOpenChange, onSuccess }:
     return (
         <Dialog open={effectiveOpen} onOpenChange={setEffectiveOpen}>
             {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-            <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>{isEdit ? "Edit Course" : "Add New Course"}</DialogTitle>
+            <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden border-none shadow-2xl">
+                <DialogHeader className="px-6 pt-6 pb-4 bg-gradient-to-br from-primary/10 via-background to-background">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2.5 rounded-xl bg-primary/10 text-primary">
+                            <BookOpen className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <DialogTitle className="text-xl font-bold">
+                                {isEdit ? "Update Course" : "Create New Course"}
+                            </DialogTitle>
+                            <p className="text-sm text-muted-foreground mt-0.5">
+                                {isEdit ? "Modify course details and fee structures" : "Define a new course and its associated fees"}
+                            </p>
+                        </div>
+                    </div>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="space-y-6 py-4">
+
+                <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-6">
                     {error && (
-                        <div className="p-3 bg-destructive/10 text-destructive text-sm rounded-md font-medium">
+                        <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 text-sm rounded-lg border border-red-100 dark:border-red-900/50 font-medium animate-in fade-in slide-in-from-top-1">
+                            <AlertCircle className="w-4 h-4 flex-shrink-0" />
                             {error}
                         </div>
                     )}
+
                     <div className="space-y-2">
-                        <Label htmlFor="name">Course Name</Label>
-                        <Input
-                            id="name"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            required
-                            placeholder="e.g. Mathematics"
-                            className="bg-muted/30 focus:bg-background"
-                        />
+                        <Label htmlFor="name" className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                            Course Name
+                        </Label>
+                        <div className="relative group">
+                            <Input
+                                id="name"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                required
+                                placeholder="e.g. Advanced Mathematics"
+                                className="pl-4 h-11 bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200"
+                            />
+                        </div>
                     </div>
+
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                            <Label>Fees</Label>
-                            <Button type="button" variant="outline" size="sm" onClick={addFee}>
-                                Add Fee
+                            <Label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+                                Fee Structure
+                            </Label>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={addFee}
+                                className="h-8 border-dashed border-zinc-300 hover:border-primary hover:text-primary transition-colors"
+                            >
+                                <Plus className="w-3.5 h-3.5 mr-1.5" />
+                                Add Fee Type
                             </Button>
                         </div>
-                        {fees.filter(f => !f.isDeleted).map((feeItem, index) => {
-                            // Find actual index in state
-                            const actualIndex = fees.indexOf(feeItem);
-                            return (
-                                <div key={actualIndex} className="flex gap-2 items-start bg-muted/20 p-3 rounded-lg relative group">
-                                    <div className="flex-1 space-y-2">
-                                        <Select
-                                            value={feeItem.type}
-                                            onValueChange={(val) => updateFee(actualIndex, 'type', val)}
-                                            required
-                                        >
-                                            <SelectTrigger className="h-8 text-sm bg-muted/30 focus:bg-background">
-                                                <SelectValue placeholder="Select Fee Type" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                {FEE_TYPES.map((type) => (
-                                                    <SelectItem key={type} value={type}>
-                                                        {type}
-                                                    </SelectItem>
-                                                ))}
-                                            </SelectContent>
-                                        </Select>
-                                        <div className="relative">
-                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-medium">
-                                                Rs.
-                                            </span>
-                                            <Input
-                                                type="number"
-                                                min="0"
-                                                step="0.01"
-                                                value={feeItem.fee}
-                                                onChange={(e) => updateFee(actualIndex, 'fee', e.target.value)}
-                                                required
-                                                placeholder="0.00"
-                                                className="pl-9 h-8 text-sm"
-                                            />
+
+                        <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-zinc-200 dark:scrollbar-thumb-zinc-800">
+                            {fees.filter(f => !f.isDeleted).map((feeItem, index) => {
+                                const actualIndex = fees.indexOf(feeItem);
+                                return (
+                                    <div
+                                        key={actualIndex}
+                                        className="group relative flex flex-col gap-3 p-4 rounded-xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-200 animate-in fade-in zoom-in-95"
+                                    >
+                                        <div className="flex gap-3 items-start">
+                                            <div className="flex-1 space-y-3">
+                                                <div className="space-y-1.5">
+                                                    <Select
+                                                        value={feeItem.type}
+                                                        onValueChange={(val) => updateFee(actualIndex, 'type', val)}
+                                                        required
+                                                    >
+                                                        <SelectTrigger className="h-9 bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 focus:ring-2 focus:ring-primary/20">
+                                                            <SelectValue placeholder="Select Type" />
+                                                        </SelectTrigger>
+                                                        <SelectContent>
+                                                            {FEE_TYPES.map((type) => (
+                                                                <SelectItem key={type} value={type}>
+                                                                    {type}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                </div>
+                                                <div className="relative">
+                                                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">
+                                                        {/* <IndianRupee className="w-3.5 h-3.5" /> */}
+                                                        Rs.
+                                                    </div>
+                                                    <Input
+                                                        type="number"
+                                                        min="0"
+                                                        step="0.01"
+                                                        value={feeItem.fee}
+                                                        onChange={(e) => updateFee(actualIndex, 'fee', e.target.value)}
+                                                        required
+                                                        placeholder="0.00"
+                                                        className="pl-9 h-9 bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 focus:ring-2 focus:ring-primary/20"
+                                                    />
+                                                </div>
+                                            </div>
+                                            {fees.filter(f => !f.isDeleted).length > 1 && (
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    className="h-8 w-8 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+                                                    onClick={() => removeFee(actualIndex)}
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            )}
                                         </div>
                                     </div>
-                                    <Button
-                                        type="button"
-                                        variant="ghost"
-                                        size="icon"
-                                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-                                        onClick={() => removeFee(actualIndex)}
-                                        disabled={fees.filter(f => !f.isDeleted).length <= 1}
-                                    >
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" /></svg>
-                                    </Button>
-                                </div>
-                            );
-                        })}
+                                );
+                            })}
+                        </div>
                     </div>
-                    <div className="flex justify-end gap-3 pt-2">
-                        <Button type="button" variant="outline" onClick={() => setEffectiveOpen(false)}>
-                            Cancel
+
+                    <div className="flex items-center justify-end gap-3 pt-2">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => setEffectiveOpen(false)}
+                            className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
+                        >
+                            Discard
                         </Button>
-                        <Button type="submit" disabled={loading} className="shadow-sm">
-                            {loading ? "Saving..." : "Save"}
+                        <Button
+                            type="submit"
+                            disabled={loading}
+                            className="min-w-[100px] bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
+                        >
+                            {loading ? (
+                                <>
+                                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                    Saving...
+                                </>
+                            ) : (
+                                "Save Course"
+                            )}
                         </Button>
                     </div>
                 </form>

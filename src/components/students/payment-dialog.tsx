@@ -23,15 +23,18 @@ export function PaymentDialog({ studentId, studentName, trigger, onSuccess }: Pa
     const [summaryLoading, setSummaryLoading] = useState(false);
     const [amount, setAmount] = useState("");
     const [paymentMethod, setPaymentMethod] = useState("");
+    const [selectedCourseId, setSelectedCourseId] = useState<string>("");
+    const [selectedFeeId, setSelectedFeeId] = useState<string>("");
     const [formError, setFormError] = useState<string | null>(null);
     const [summary, setSummary] = useState<{
         totalFees: number;
         totalPaid: number;
         remainingBalance: number;
         enrolledCourses: {
+            courseId: number;
             courseName: string;
             fee: number;
-            feeBreakdown: { type: string; fee: number }[];
+            feeBreakdown: { id: number; type: string; fee: number }[];
         }[];
     } | null>(null);
 
@@ -80,6 +83,8 @@ export function PaymentDialog({ studentId, studentName, trigger, onSuccess }: Pa
             studentId,
             amount: paymentAmount,
             paymentMethod,
+            courseId: selectedCourseId ? parseInt(selectedCourseId) : undefined,
+            courseFeeId: selectedFeeId ? parseInt(selectedFeeId) : undefined,
         });
 
         if (result.success) {
@@ -209,6 +214,62 @@ export function PaymentDialog({ studentId, studentName, trigger, onSuccess }: Pa
                                         <SelectItem value="Bank Transfer">Bank Transfer</SelectItem>
                                         <SelectItem value="Online Payment">Online Payment</SelectItem>
                                         <SelectItem value="Cheque">Cheque</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2 col-span-2 sm:col-span-1">
+                                <Label htmlFor="course">Course</Label>
+                                <Select
+                                    value={selectedCourseId}
+                                    onValueChange={(val) => {
+                                        setSelectedCourseId(val);
+                                        setSelectedFeeId(""); // Reset fee selection when course changes
+                                        setFormError(null);
+                                    }}
+                                    required
+                                >
+                                    <SelectTrigger id="course" className="bg-muted/30 focus:bg-background">
+                                        <SelectValue placeholder="Select Course" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {summary.enrolledCourses.map((course) => (
+                                            <SelectItem key={course.courseId} value={course.courseId.toString()}>
+                                                {course.courseName}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+
+                            <div className="space-y-2 col-span-2 sm:col-span-1">
+                                <Label htmlFor="fee-type">Fee Type</Label>
+                                <Select
+                                    value={selectedFeeId}
+                                    onValueChange={(val) => {
+                                        setSelectedFeeId(val);
+                                        setFormError(null);
+                                        // Auto-fill amount if a fee is selected and amount is empty
+                                        const course = summary.enrolledCourses.find(c => c.courseId.toString() === selectedCourseId);
+                                        const fee = course?.feeBreakdown.find(f => f.id.toString() === val);
+                                        if (fee && (!amount || amount === "0" || amount === "")) {
+                                            setAmount(fee.fee.toString());
+                                        }
+                                    }}
+                                    required
+                                    disabled={!selectedCourseId}
+                                >
+                                    <SelectTrigger id="fee-type" className="bg-muted/30 focus:bg-background">
+                                        <SelectValue placeholder="Select Fee" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {summary.enrolledCourses
+                                            .find(c => c.courseId.toString() === selectedCourseId)
+                                            ?.feeBreakdown.map((f) => (
+                                                <SelectItem key={f.id} value={f.id.toString()}>
+                                                    {f.type} (Rs. {f.fee.toFixed(2)})
+                                                </SelectItem>
+                                            ))}
                                     </SelectContent>
                                 </Select>
                             </div>

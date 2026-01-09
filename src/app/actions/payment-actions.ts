@@ -70,9 +70,10 @@ export async function getStudentPaymentSummary(studentId: number) {
         totalPaid,
         remainingBalance,
         enrolledCourses: student.enrollments.map(e => ({
+          courseId: e.course.id,
           courseName: e.course.name,
           fee: e.course.fees.reduce((sum, f) => sum + f.fee, 0),
-          feeBreakdown: e.course.fees.map(f => ({ type: f.type, fee: f.fee }))
+          feeBreakdown: e.course.fees.map(f => ({ id: f.id, type: f.type, fee: f.fee }))
         })),
       },
     };
@@ -86,6 +87,8 @@ export async function createPayment(data: {
   studentId: number;
   amount: number;
   paymentMethod: string;
+  courseId?: number;
+  courseFeeId?: number;
 }) {
   try {
     const session = await getServerAuthSession();
@@ -147,6 +150,8 @@ export async function createPayment(data: {
         date: now,
         time: timeString,
         userId: userId,
+        courseId: data.courseId,
+        courseFeeId: data.courseFeeId,
       },
     });
 
@@ -221,6 +226,8 @@ export async function getStudentPayments(studentId: number) {
         deletedAt: null,
       },
       include: {
+        course: true,
+        courseFee: true,
         user: {
           select: {
             id: true,
@@ -299,6 +306,7 @@ export async function getPaymentReports(filters?: {
     const allPayments = await prisma.payment.findMany({
       where,
       include: {
+        course: true, // Include course info for direct link aggregation
         student: {
           include: {
             branch: true,
@@ -331,34 +339,46 @@ export async function getPaymentReports(filters?: {
     allPayments.forEach(payment => {
       const amount = payment.fee;
       
-      // Course Aggregation (Proportional distribution)
-      const enrollments = payment.student.enrollments;
-      const totalStudentFees = enrollments.reduce((sum: number, e: any) => {
-        return sum + e.course.fees.reduce((fSum: number, f: any) => fSum + f.fee, 0);
-      }, 0);
-
-      let attributedToFilteredCourse = 0;
-      if (totalStudentFees > 0) {
-        enrollments.forEach((enrollment: any) => {
-          const courseName = enrollment.course.name;
-          const courseTotalFee = enrollment.course.fees.reduce((fSum: number, f: any) => fSum + f.fee, 0);
-          const proportion = courseTotalFee / totalStudentFees;
-          const attributedAmount = amount * proportion;
+      // Course Aggregation
+      // If the payment is directly linked to a course, use that.
+      // Otherwise, use the old proportional logic for legacy data.
+      if (payment.courseId) {
+          const courseName = payment.course?.name || "Unknown Course";
+          courseTotals[courseName] = (courseTotals[courseName] || 0) + amount;
           
-          courseTotals[courseName] = (courseTotals[courseName] || 0) + attributedAmount;
-          
-          if (filters?.courseId === enrollment.courseId) {
-             attributedToFilteredCourse = attributedAmount;
+          if (filters?.courseId && payment.courseId === filters.courseId) {
+              totalRevenue += amount;
+          } else if (!filters?.courseId) {
+              totalRevenue += amount;
           }
-        });
-      }
-
-      // If filtering by course, total revenue is only what's attributed to that course
-      // Otherwise it's the full payment amount
-      if (filters?.courseId) {
-        totalRevenue += attributedToFilteredCourse;
       } else {
-        totalRevenue += amount;
+          // Old Proportional Distribution for legacy payments
+          const enrollments = payment.student.enrollments;
+          const totalStudentFees = enrollments.reduce((sum: number, e: any) => {
+            return sum + e.course.fees.reduce((fSum: number, f: any) => fSum + f.fee, 0);
+          }, 0);
+
+          let attributedToFilteredCourse = 0;
+          if (totalStudentFees > 0) {
+            enrollments.forEach((enrollment: any) => {
+              const courseName = enrollment.course.name;
+              const courseTotalFee = enrollment.course.fees.reduce((fSum: number, f: any) => fSum + f.fee, 0);
+              const proportion = courseTotalFee / totalStudentFees;
+              const attributedAmount = amount * proportion;
+              
+              courseTotals[courseName] = (courseTotals[courseName] || 0) + attributedAmount;
+              
+              if (filters?.courseId === enrollment.courseId) {
+                 attributedToFilteredCourse = attributedAmount;
+              }
+            });
+          }
+
+          if (filters?.courseId) {
+            totalRevenue += attributedToFilteredCourse;
+          } else {
+            totalRevenue += amount;
+          }
       }
 
       // Branch Aggregation

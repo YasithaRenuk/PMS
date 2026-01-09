@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createCourse, updateCourse } from "@/app/actions/course-actions";
 import { toast } from "sonner";
+import { FEE_TYPES } from "@/lib/constants";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type Course = {
     id: number;
@@ -150,13 +152,22 @@ export function CourseDialog({ course, trigger, open, onOpenChange, onSuccess }:
                             return (
                                 <div key={actualIndex} className="flex gap-2 items-start bg-muted/20 p-3 rounded-lg relative group">
                                     <div className="flex-1 space-y-2">
-                                        <Input
-                                            placeholder="Fee Type (e.g. Monthly Fee)"
+                                        <Select
                                             value={feeItem.type}
-                                            onChange={(e) => updateFee(actualIndex, 'type', e.target.value)}
+                                            onValueChange={(val) => updateFee(actualIndex, 'type', val)}
                                             required
-                                            className="h-8 text-sm"
-                                        />
+                                        >
+                                            <SelectTrigger className="h-8 text-sm bg-muted/30 focus:bg-background">
+                                                <SelectValue placeholder="Select Fee Type" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {FEE_TYPES.map((type) => (
+                                                    <SelectItem key={type} value={type}>
+                                                        {type}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                         <div className="relative">
                                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-xs font-medium">
                                                 Rs.

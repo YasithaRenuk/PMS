@@ -16,6 +16,12 @@ interface Payment {
         id: number;
         username: string;
     };
+    course?: {
+        name: string;
+    };
+    courseFee?: {
+        type: string;
+    };
 }
 
 interface PaymentRecordsDialogProps {
@@ -76,6 +82,8 @@ export function PaymentRecordsDialog({ studentId, studentName, trigger }: Paymen
                                         <TableHead>Date</TableHead>
                                         <TableHead>Time</TableHead>
                                         <TableHead>Amount</TableHead>
+                                        <TableHead>Course</TableHead>
+                                        <TableHead>Fee Type</TableHead>
                                         <TableHead>Payment Method</TableHead>
                                         <TableHead>Added By</TableHead>
                                     </TableRow>
@@ -87,6 +95,8 @@ export function PaymentRecordsDialog({ studentId, studentName, trigger }: Paymen
                                                 <TableCell>{formatDate(payment.date)}</TableCell>
                                                 <TableCell>{payment.time}</TableCell>
                                                 <TableCell className="font-medium">Rs. {payment.fee.toFixed(2)}</TableCell>
+                                                <TableCell>{payment.course?.name || "-"}</TableCell>
+                                                <TableCell>{payment.courseFee?.type || "-"}</TableCell>
                                                 <TableCell>{payment.payment_method}</TableCell>
                                                 <TableCell className="text-muted-foreground">{payment.user.username}</TableCell>
                                             </TableRow>
@@ -111,6 +121,11 @@ export function PaymentRecordsDialog({ studentId, studentName, trigger }: Paymen
                                             <div>
                                                 <p className="font-bold text-base text-green-600">Rs. {payment.fee.toFixed(2)}</p>
                                                 <p className="text-xs text-muted-foreground">{formatDate(payment.date)} at {payment.time}</p>
+                                                {(payment.course || payment.courseFee) && (
+                                                    <p className="text-[11px] font-medium mt-1">
+                                                        {payment.course?.name} {payment.courseFee?.type && ` - ${payment.courseFee.type}`}
+                                                    </p>
+                                                )}
                                             </div>
                                             <div className="text-right">
                                                 <span className="bg-secondary px-2 py-0.5 rounded text-[10px] uppercase font-semibold">

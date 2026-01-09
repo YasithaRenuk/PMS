@@ -53,6 +53,7 @@ model Course {
   name        String
   fees        CourseFee[]
   enrollments Enrollment[]
+  payments    Payment[]
   deletedAt   DateTime?
 }
 
@@ -62,6 +63,7 @@ model CourseFee {
   course    Course   @relation(fields: [courseId], references: [id])
   type      String   // e.g. entrance fee, monthly fee, cloth fee
   fee       Float
+  payments  Payment[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
@@ -77,6 +79,10 @@ model Payment {
   student        Student   @relation(fields: [studentId], references: [id])
   userId         Int
   user           User      @relation(fields: [userId], references: [id])
+  courseId       Int?
+  course         Course?   @relation(fields: [courseId], references: [id])
+  courseFeeId    Int?
+  courseFee      CourseFee? @relation(fields: [courseFeeId], references: [id])
   sms_status     Boolean   @default(false)
   deletedAt      DateTime?
 }

@@ -241,6 +241,7 @@ export type CourseFeeWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"CourseFee"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"CourseFee"> | Date | string | null
   course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
+  payments?: Prisma.PaymentListRelationFilter
 }
 
 export type CourseFeeOrderByWithRelationInput = {
@@ -252,6 +253,7 @@ export type CourseFeeOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   course?: Prisma.CourseOrderByWithRelationInput
+  payments?: Prisma.PaymentOrderByRelationAggregateInput
   _relevance?: Prisma.CourseFeeOrderByRelevanceInput
 }
 
@@ -267,6 +269,7 @@ export type CourseFeeWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"CourseFee"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"CourseFee"> | Date | string | null
   course?: Prisma.XOR<Prisma.CourseScalarRelationFilter, Prisma.CourseWhereInput>
+  payments?: Prisma.PaymentListRelationFilter
 }, "id">
 
 export type CourseFeeOrderByWithAggregationInput = {
@@ -304,6 +307,7 @@ export type CourseFeeCreateInput = {
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   course: Prisma.CourseCreateNestedOneWithoutFeesInput
+  payments?: Prisma.PaymentCreateNestedManyWithoutCourseFeeInput
 }
 
 export type CourseFeeUncheckedCreateInput = {
@@ -314,6 +318,7 @@ export type CourseFeeUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutCourseFeeInput
 }
 
 export type CourseFeeUpdateInput = {
@@ -323,6 +328,7 @@ export type CourseFeeUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   course?: Prisma.CourseUpdateOneRequiredWithoutFeesNestedInput
+  payments?: Prisma.PaymentUpdateManyWithoutCourseFeeNestedInput
 }
 
 export type CourseFeeUncheckedUpdateInput = {
@@ -333,6 +339,7 @@ export type CourseFeeUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutCourseFeeNestedInput
 }
 
 export type CourseFeeCreateManyInput = {
@@ -421,6 +428,11 @@ export type CourseFeeSumOrderByAggregateInput = {
   fee?: Prisma.SortOrder
 }
 
+export type CourseFeeNullableScalarRelationFilter = {
+  is?: Prisma.CourseFeeWhereInput | null
+  isNot?: Prisma.CourseFeeWhereInput | null
+}
+
 export type CourseFeeCreateNestedManyWithoutCourseInput = {
   create?: Prisma.XOR<Prisma.CourseFeeCreateWithoutCourseInput, Prisma.CourseFeeUncheckedCreateWithoutCourseInput> | Prisma.CourseFeeCreateWithoutCourseInput[] | Prisma.CourseFeeUncheckedCreateWithoutCourseInput[]
   connectOrCreate?: Prisma.CourseFeeCreateOrConnectWithoutCourseInput | Prisma.CourseFeeCreateOrConnectWithoutCourseInput[]
@@ -471,12 +483,29 @@ export type FloatFieldUpdateOperationsInput = {
   divide?: number
 }
 
+export type CourseFeeCreateNestedOneWithoutPaymentsInput = {
+  create?: Prisma.XOR<Prisma.CourseFeeCreateWithoutPaymentsInput, Prisma.CourseFeeUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.CourseFeeCreateOrConnectWithoutPaymentsInput
+  connect?: Prisma.CourseFeeWhereUniqueInput
+}
+
+export type CourseFeeUpdateOneWithoutPaymentsNestedInput = {
+  create?: Prisma.XOR<Prisma.CourseFeeCreateWithoutPaymentsInput, Prisma.CourseFeeUncheckedCreateWithoutPaymentsInput>
+  connectOrCreate?: Prisma.CourseFeeCreateOrConnectWithoutPaymentsInput
+  upsert?: Prisma.CourseFeeUpsertWithoutPaymentsInput
+  disconnect?: Prisma.CourseFeeWhereInput | boolean
+  delete?: Prisma.CourseFeeWhereInput | boolean
+  connect?: Prisma.CourseFeeWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.CourseFeeUpdateToOneWithWhereWithoutPaymentsInput, Prisma.CourseFeeUpdateWithoutPaymentsInput>, Prisma.CourseFeeUncheckedUpdateWithoutPaymentsInput>
+}
+
 export type CourseFeeCreateWithoutCourseInput = {
   type: string
   fee: number
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  payments?: Prisma.PaymentCreateNestedManyWithoutCourseFeeInput
 }
 
 export type CourseFeeUncheckedCreateWithoutCourseInput = {
@@ -486,6 +515,7 @@ export type CourseFeeUncheckedCreateWithoutCourseInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutCourseFeeInput
 }
 
 export type CourseFeeCreateOrConnectWithoutCourseInput = {
@@ -527,6 +557,60 @@ export type CourseFeeScalarWhereInput = {
   deletedAt?: Prisma.DateTimeNullableFilter<"CourseFee"> | Date | string | null
 }
 
+export type CourseFeeCreateWithoutPaymentsInput = {
+  type: string
+  fee: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  course: Prisma.CourseCreateNestedOneWithoutFeesInput
+}
+
+export type CourseFeeUncheckedCreateWithoutPaymentsInput = {
+  id?: number
+  courseId: number
+  type: string
+  fee: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+}
+
+export type CourseFeeCreateOrConnectWithoutPaymentsInput = {
+  where: Prisma.CourseFeeWhereUniqueInput
+  create: Prisma.XOR<Prisma.CourseFeeCreateWithoutPaymentsInput, Prisma.CourseFeeUncheckedCreateWithoutPaymentsInput>
+}
+
+export type CourseFeeUpsertWithoutPaymentsInput = {
+  update: Prisma.XOR<Prisma.CourseFeeUpdateWithoutPaymentsInput, Prisma.CourseFeeUncheckedUpdateWithoutPaymentsInput>
+  create: Prisma.XOR<Prisma.CourseFeeCreateWithoutPaymentsInput, Prisma.CourseFeeUncheckedCreateWithoutPaymentsInput>
+  where?: Prisma.CourseFeeWhereInput
+}
+
+export type CourseFeeUpdateToOneWithWhereWithoutPaymentsInput = {
+  where?: Prisma.CourseFeeWhereInput
+  data: Prisma.XOR<Prisma.CourseFeeUpdateWithoutPaymentsInput, Prisma.CourseFeeUncheckedUpdateWithoutPaymentsInput>
+}
+
+export type CourseFeeUpdateWithoutPaymentsInput = {
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  fee?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  course?: Prisma.CourseUpdateOneRequiredWithoutFeesNestedInput
+}
+
+export type CourseFeeUncheckedUpdateWithoutPaymentsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  courseId?: Prisma.IntFieldUpdateOperationsInput | number
+  type?: Prisma.StringFieldUpdateOperationsInput | string
+  fee?: Prisma.FloatFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
 export type CourseFeeCreateManyCourseInput = {
   id?: number
   type: string
@@ -542,6 +626,7 @@ export type CourseFeeUpdateWithoutCourseInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payments?: Prisma.PaymentUpdateManyWithoutCourseFeeNestedInput
 }
 
 export type CourseFeeUncheckedUpdateWithoutCourseInput = {
@@ -551,6 +636,7 @@ export type CourseFeeUncheckedUpdateWithoutCourseInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  payments?: Prisma.PaymentUncheckedUpdateManyWithoutCourseFeeNestedInput
 }
 
 export type CourseFeeUncheckedUpdateManyWithoutCourseInput = {
@@ -563,6 +649,35 @@ export type CourseFeeUncheckedUpdateManyWithoutCourseInput = {
 }
 
 
+/**
+ * Count Type CourseFeeCountOutputType
+ */
+
+export type CourseFeeCountOutputType = {
+  payments: number
+}
+
+export type CourseFeeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  payments?: boolean | CourseFeeCountOutputTypeCountPaymentsArgs
+}
+
+/**
+ * CourseFeeCountOutputType without action
+ */
+export type CourseFeeCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CourseFeeCountOutputType
+   */
+  select?: Prisma.CourseFeeCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * CourseFeeCountOutputType without action
+ */
+export type CourseFeeCountOutputTypeCountPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PaymentWhereInput
+}
+
 
 export type CourseFeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -573,6 +688,8 @@ export type CourseFeeSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   updatedAt?: boolean
   deletedAt?: boolean
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
+  payments?: boolean | Prisma.CourseFee$paymentsArgs<ExtArgs>
+  _count?: boolean | Prisma.CourseFeeCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["courseFee"]>
 
 
@@ -590,12 +707,15 @@ export type CourseFeeSelectScalar = {
 export type CourseFeeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "courseId" | "type" | "fee" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["courseFee"]>
 export type CourseFeeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   course?: boolean | Prisma.CourseDefaultArgs<ExtArgs>
+  payments?: boolean | Prisma.CourseFee$paymentsArgs<ExtArgs>
+  _count?: boolean | Prisma.CourseFeeCountOutputTypeDefaultArgs<ExtArgs>
 }
 
 export type $CourseFeePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "CourseFee"
   objects: {
     course: Prisma.$CoursePayload<ExtArgs>
+    payments: Prisma.$PaymentPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -946,6 +1066,7 @@ readonly fields: CourseFeeFieldRefs;
 export interface Prisma__CourseFeeClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   course<T extends Prisma.CourseDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CourseDefaultArgs<ExtArgs>>): Prisma.Prisma__CourseClient<runtime.Types.Result.GetResult<Prisma.$CoursePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  payments<T extends Prisma.CourseFee$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CourseFee$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1322,6 +1443,30 @@ export type CourseFeeDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * Limit how many CourseFees to delete.
    */
   limit?: number
+}
+
+/**
+ * CourseFee.payments
+ */
+export type CourseFee$paymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Payment
+   */
+  select?: Prisma.PaymentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Payment
+   */
+  omit?: Prisma.PaymentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PaymentInclude<ExtArgs> | null
+  where?: Prisma.PaymentWhereInput
+  orderBy?: Prisma.PaymentOrderByWithRelationInput | Prisma.PaymentOrderByWithRelationInput[]
+  cursor?: Prisma.PaymentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PaymentScalarFieldEnum | Prisma.PaymentScalarFieldEnum[]
 }
 
 /**

@@ -379,11 +379,32 @@ export async function deleteStudent(id: number) {
         }
     }
 
-    const student = await prisma.student.update({
-        where: { id },
-        data: {
-            deletedAt: new Date(),
-        },
+    const student = await prisma.$transaction(async (tx) => {
+        // Soft delete the student
+        const deletedStudent = await tx.student.update({
+            where: { id },
+            data: {
+                deletedAt: new Date(),
+            },
+        });
+
+        // Soft delete all enrollments
+        await tx.enrollment.updateMany({
+            where: { studentId: id, deletedAt: null },
+            data: {
+                deletedAt: new Date(),
+            },
+        });
+
+        // Soft delete all payments
+        await tx.payment.updateMany({
+            where: { studentId: id, deletedAt: null },
+            data: {
+                deletedAt: new Date(),
+            },
+        });
+
+        return deletedStudent;
     });
 
     revalidatePath("/students");

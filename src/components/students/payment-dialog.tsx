@@ -37,6 +37,7 @@ export function PaymentDialog({ studentId, studentName, trigger, onSuccess }: Pa
             fee: number;
             feeBreakdown: { id: number; type: string; fee: number; paid: number; remaining: number }[];
         }[];
+        systemFees: { id: number; name: string; amount: number; paid: number; remaining: number }[];
     } | null>(null);
 
     // Load payment summary when dialog opens
@@ -74,11 +75,19 @@ export function PaymentDialog({ studentId, studentName, trigger, onSuccess }: Pa
 
         // Specific fee validation
         if (selectedFeeId && summary) {
-            const course = summary.enrolledCourses.find(c => c.courseId.toString() === selectedCourseId);
-            const fee = course?.feeBreakdown.find(f => f.id.toString() === selectedFeeId);
-            if (fee && paymentAmount > fee.remaining) {
-                setFormError(`Payment amount cannot exceed the fee balance for ${fee.type} (Rs. ${fee.remaining.toFixed(2)})`);
-                return;
+            if (selectedCourseId === "system") {
+                const fee = summary.systemFees.find(f => f.id.toString() === selectedFeeId);
+                if (fee && paymentAmount > fee.remaining) {
+                    setFormError(`Payment amount cannot exceed the fee balance for ${fee.name} (Rs. ${fee.remaining.toFixed(2)})`);
+                    return;
+                }
+            } else {
+                const course = summary.enrolledCourses.find(c => c.courseId.toString() === selectedCourseId);
+                const fee = course?.feeBreakdown.find(f => f.id.toString() === selectedFeeId);
+                if (fee && paymentAmount > fee.remaining) {
+                    setFormError(`Payment amount cannot exceed the fee balance for ${fee.type} (Rs. ${fee.remaining.toFixed(2)})`);
+                    return;
+                }
             }
         }
 
@@ -94,8 +103,9 @@ export function PaymentDialog({ studentId, studentName, trigger, onSuccess }: Pa
             studentId,
             amount: paymentAmount,
             paymentMethod,
-            courseId: selectedCourseId ? parseInt(selectedCourseId) : undefined,
-            courseFeeId: selectedFeeId ? parseInt(selectedFeeId) : undefined,
+            courseId: selectedCourseId && selectedCourseId !== "system" ? parseInt(selectedCourseId) : undefined,
+            courseFeeId: selectedCourseId !== "system" && selectedFeeId ? parseInt(selectedFeeId) : undefined,
+            systemFeeId: selectedCourseId === "system" && selectedFeeId ? parseInt(selectedFeeId) : undefined,
         });
 
         if (result.success) {
@@ -151,8 +161,58 @@ export function PaymentDialog({ studentId, studentName, trigger, onSuccess }: Pa
                                     <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 to-zinc-200 rounded-2xl blur opacity-30 group-hover:opacity-100 transition duration-1000 group-hover:duration-200"></div>
                                     <div className="relative bg-white rounded-2xl border border-zinc-100 shadow-xl overflow-hidden">
                                         <div className="p-5 space-y-6">
-                                            {summary.enrolledCourses.length > 0 ? (
+                                            {summary.enrolledCourses.length > 0 || summary.systemFees.length > 0 ? (
                                                 <div className="space-y-5">
+                                                    {/* System Fees Section */}
+                                                    {summary.systemFees.length > 0 && (
+                                                        <div className="space-y-3">
+                                                            <div className="flex justify-between items-center bg-zinc-900/5 p-2 rounded-lg border border-zinc-200/50">
+                                                                <span className="text-xs font-black text-primary uppercase italic tracking-tight flex items-center gap-2">
+                                                                    <Globe className="h-3 w-3" /> General Fees
+                                                                </span>
+                                                            </div>
+                                                            <div className="space-y-4 pl-1">
+                                                                {summary.systemFees.map((f) => {
+                                                                    const progress = (f.paid / f.amount) * 100;
+                                                                    const isCleared = f.remaining <= 0;
+                                                                    return (
+                                                                        <div key={f.id} className="space-y-1.5 px-3 border-l-2 border-primary/30 hover:border-primary transition-colors">
+                                                                            <div className="flex justify-between items-end">
+                                                                                <div className="flex flex-col">
+                                                                                    <div className="flex items-center gap-1.5">
+                                                                                        <span className="text-[11px] font-bold text-zinc-600 uppercase tracking-tighter">{f.name}</span>
+                                                                                        {isCleared && <CheckCircle2 className="h-3 w-3 text-emerald-500 fill-emerald-50" />}
+                                                                                    </div>
+                                                                                    <div className="text-[9px] font-medium text-zinc-400">
+                                                                                        Remittance: Rs. {f.paid.toLocaleString()} / {f.amount.toLocaleString()}
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div className="flex flex-col items-end">
+                                                                                    <span className={cn(
+                                                                                        "text-[10px] font-mono font-black",
+                                                                                        isCleared ? "text-emerald-600" : "text-zinc-900"
+                                                                                    )}>
+                                                                                        {isCleared ? "Rs. 0.00" : `Rs. ${f.remaining.toLocaleString()}`}
+                                                                                    </span>
+                                                                                    <span className="text-[8px] font-bold uppercase text-zinc-400 leading-none">Due</span>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div className="h-1 w-full bg-zinc-100 rounded-full overflow-hidden">
+                                                                                <div
+                                                                                    className={cn(
+                                                                                        "h-full transition-all duration-1000 ease-in-out shadow-[0_0_8px_rgba(var(--primary),0.3)]",
+                                                                                        isCleared ? "bg-emerald-500" : "bg-primary"
+                                                                                    )}
+                                                                                    style={{ width: `${Math.min(progress, 100)}%` }}
+                                                                                />
+                                                                            </div>
+                                                                        </div>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        </div>
+                                                    )}
+
                                                     {summary.enrolledCourses.map((course) => (
                                                         <div key={course.courseId} className="space-y-3">
                                                             <div className="flex justify-between items-center bg-zinc-50/50 p-2 rounded-lg border border-zinc-100/50">
@@ -286,6 +346,14 @@ export function PaymentDialog({ studentId, studentName, trigger, onSuccess }: Pa
                                                     <SelectValue placeholder="Select target course" />
                                                 </SelectTrigger>
                                                 <SelectContent className="rounded-2xl overflow-hidden shadow-2xl border-zinc-100 translate-y-1">
+                                                    {summary.systemFees.length > 0 && (
+                                                        <SelectItem value="system" className="py-4 px-4 focus:bg-primary/5 transition-colors border-b border-zinc-100 italic">
+                                                            <div className="flex items-center justify-between w-full pr-6 gap-4">
+                                                                <span className="font-bold tracking-tight text-primary uppercase">General Fees</span>
+                                                                <span className="text-[8px] bg-primary/10 text-primary font-black px-2 py-0.5 rounded-full tracking-widest">SYSTEM</span>
+                                                            </div>
+                                                        </SelectItem>
+                                                    )}
                                                     {summary.enrolledCourses.map((course) => {
                                                         const isFullyPaid = course.feeBreakdown.every(f => f.remaining <= 0);
                                                         return (
@@ -313,10 +381,17 @@ export function PaymentDialog({ studentId, studentName, trigger, onSuccess }: Pa
                                                 onValueChange={(val) => {
                                                     setSelectedFeeId(val);
                                                     setFormError(null);
-                                                    const course = summary.enrolledCourses.find(c => c.courseId.toString() === selectedCourseId);
-                                                    const fee = course?.feeBreakdown.find(f => f.id.toString() === val);
-                                                    if (fee && (!amount || amount === "0" || amount === "")) {
-                                                        setAmount(fee.remaining.toString());
+                                                    if (selectedCourseId === "system") {
+                                                        const fee = summary.systemFees.find(f => f.id.toString() === val);
+                                                        if (fee && (!amount || amount === "0" || amount === "")) {
+                                                            setAmount(fee.remaining.toString());
+                                                        }
+                                                    } else {
+                                                        const course = summary.enrolledCourses.find(c => c.courseId.toString() === selectedCourseId);
+                                                        const fee = course?.feeBreakdown.find(f => f.id.toString() === val);
+                                                        if (fee && (!amount || amount === "0" || amount === "")) {
+                                                            setAmount(fee.remaining.toString());
+                                                        }
                                                     }
                                                 }}
                                                 required
@@ -326,18 +401,31 @@ export function PaymentDialog({ studentId, studentName, trigger, onSuccess }: Pa
                                                     <SelectValue placeholder="Fee type" />
                                                 </SelectTrigger>
                                                 <SelectContent className="rounded-2xl shadow-2xl translate-y-1">
-                                                    {summary.enrolledCourses
-                                                        .find(c => c.courseId.toString() === selectedCourseId)
-                                                        ?.feeBreakdown
-                                                        .filter(f => f.remaining > 0)
-                                                        .map((f) => (
-                                                            <SelectItem key={f.id} value={f.id.toString()} className="py-3 px-4">
-                                                                <div className="flex flex-col gap-0.5">
-                                                                    <span className="font-bold tracking-tight leading-none">{f.type}</span>
-                                                                    <span className="text-[9px] font-mono text-rose-500 font-bold">DUE: Rs. {f.remaining.toLocaleString()}</span>
-                                                                </div>
-                                                            </SelectItem>
-                                                        ))}
+                                                    {selectedCourseId === "system" ? (
+                                                        summary.systemFees
+                                                            .filter(f => f.remaining > 0)
+                                                            .map((f) => (
+                                                                <SelectItem key={f.id} value={f.id.toString()} className="py-3 px-4">
+                                                                    <div className="flex flex-col gap-0.5">
+                                                                        <span className="font-bold tracking-tight leading-none">{f.name}</span>
+                                                                        <span className="text-[9px] font-mono text-rose-500 font-bold">DUE: Rs. {f.remaining.toLocaleString()}</span>
+                                                                    </div>
+                                                                </SelectItem>
+                                                            ))
+                                                    ) : (
+                                                        summary.enrolledCourses
+                                                            .find(c => c.courseId.toString() === selectedCourseId)
+                                                            ?.feeBreakdown
+                                                            .filter(f => f.remaining > 0)
+                                                            .map((f) => (
+                                                                <SelectItem key={f.id} value={f.id.toString()} className="py-3 px-4">
+                                                                    <div className="flex flex-col gap-0.5">
+                                                                        <span className="font-bold tracking-tight leading-none">{f.type}</span>
+                                                                        <span className="text-[9px] font-mono text-rose-500 font-bold">DUE: Rs. {f.remaining.toLocaleString()}</span>
+                                                                    </div>
+                                                                </SelectItem>
+                                                            ))
+                                                    )}
                                                 </SelectContent>
                                             </Select>
                                         </div>

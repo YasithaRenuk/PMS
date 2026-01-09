@@ -56,6 +56,7 @@ export const ModelName = {
   Student: 'Student',
   Course: 'Course',
   CourseFee: 'CourseFee',
+  SystemFee: 'SystemFee',
   Payment: 'Payment',
   Enrollment: 'Enrollment'
 } as const
@@ -136,6 +137,18 @@ export const CourseFeeScalarFieldEnum = {
 export type CourseFeeScalarFieldEnum = (typeof CourseFeeScalarFieldEnum)[keyof typeof CourseFeeScalarFieldEnum]
 
 
+export const SystemFeeScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  amount: 'amount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type SystemFeeScalarFieldEnum = (typeof SystemFeeScalarFieldEnum)[keyof typeof SystemFeeScalarFieldEnum]
+
+
 export const PaymentScalarFieldEnum = {
   id: 'id',
   payment_method: 'payment_method',
@@ -146,6 +159,7 @@ export const PaymentScalarFieldEnum = {
   userId: 'userId',
   courseId: 'courseId',
   courseFeeId: 'courseFeeId',
+  systemFeeId: 'systemFeeId',
   sms_status: 'sms_status',
   deletedAt: 'deletedAt'
 } as const
@@ -216,6 +230,13 @@ export const CourseFeeOrderByRelevanceFieldEnum = {
 } as const
 
 export type CourseFeeOrderByRelevanceFieldEnum = (typeof CourseFeeOrderByRelevanceFieldEnum)[keyof typeof CourseFeeOrderByRelevanceFieldEnum]
+
+
+export const SystemFeeOrderByRelevanceFieldEnum = {
+  name: 'name'
+} as const
+
+export type SystemFeeOrderByRelevanceFieldEnum = (typeof SystemFeeOrderByRelevanceFieldEnum)[keyof typeof SystemFeeOrderByRelevanceFieldEnum]
 
 
 export const PaymentOrderByRelevanceFieldEnum = {

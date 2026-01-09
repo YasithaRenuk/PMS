@@ -65,6 +65,11 @@ export type Course = Prisma.CourseModel
  */
 export type CourseFee = Prisma.CourseFeeModel
 /**
+ * Model SystemFee
+ * 
+ */
+export type SystemFee = Prisma.SystemFeeModel
+/**
  * Model Payment
  * 
  */

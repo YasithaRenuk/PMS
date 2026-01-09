@@ -13,6 +13,11 @@ export async function getStudentPaymentSummary(studentId: number) {
       throw new Error("Unauthorized");
     }
 
+    // Get all system fees
+    const systemFees = await prisma.systemFee.findMany({
+        where: { deletedAt: null }
+    });
+
     // Get student with enrollments and payments
     const student = await prisma.student.findUnique({
       where: { id: studentId, deletedAt: null },
@@ -48,10 +53,15 @@ export async function getStudentPaymentSummary(studentId: number) {
     }
 
     // Calculate total fees from enrolled courses (summing all fee types)
-    const totalFees = student.enrollments.reduce((sum, enrollment) => {
+    const totalCourseFees = student.enrollments.reduce((sum, enrollment) => {
       const courseFees = enrollment.course.fees.reduce((fSum, f) => fSum + f.fee, 0);
       return sum + courseFees;
     }, 0);
+
+    // Calculate total system fees
+    const totalSystemFees = systemFees.reduce((sum, f) => sum + f.amount, 0);
+
+    const totalFees = totalCourseFees + totalSystemFees;
 
     // Calculate total paid amount
     const totalPaid = student.payments.reduce((sum, payment) => {
@@ -88,6 +98,19 @@ export async function getStudentPaymentSummary(studentId: number) {
             };
           })
         })),
+        systemFees: systemFees.map(f => {
+            const paidForThisFee = student.payments
+                .filter(p => p.systemFeeId === f.id)
+                .reduce((sum, p) => sum + p.fee, 0);
+            
+            return {
+                id: f.id,
+                name: f.name,
+                amount: f.amount,
+                paid: paidForThisFee,
+                remaining: f.amount - paidForThisFee
+            };
+        })
       },
     };
   } catch (error) {
@@ -102,6 +125,7 @@ export async function createPayment(data: {
   paymentMethod: string;
   courseId?: number;
   courseFeeId?: number;
+  systemFeeId?: number;
 }) {
   try {
     const session = await getServerAuthSession();
@@ -165,6 +189,7 @@ export async function createPayment(data: {
         userId: userId,
         courseId: data.courseId,
         courseFeeId: data.courseFeeId,
+        systemFeeId: data.systemFeeId,
       },
     });
 
@@ -182,6 +207,13 @@ export async function createPayment(data: {
           });
           if (feeDetail) {
               feeTypeLabel = ` for ${feeDetail.course.name} (${feeDetail.type})`;
+          }
+      } else if (data.systemFeeId) {
+          const systemFee = await prisma.systemFee.findUnique({
+              where: { id: data.systemFeeId }
+          });
+          if (systemFee) {
+              feeTypeLabel = ` for ${systemFee.name}`;
           }
       }
 
@@ -249,6 +281,7 @@ export async function getStudentPayments(studentId: number) {
       include: {
         course: true,
         courseFee: true,
+        systemFee: true,
         user: {
           select: {
             id: true,
@@ -328,6 +361,7 @@ export async function getPaymentReports(filters?: {
       where,
       include: {
         course: true, // Include course info for direct link aggregation
+        systemFee: true,
         student: {
           include: {
             branch: true,
@@ -370,6 +404,13 @@ export async function getPaymentReports(filters?: {
           if (filters?.courseId && payment.courseId === filters.courseId) {
               totalRevenue += amount;
           } else if (!filters?.courseId) {
+              totalRevenue += amount;
+          }
+      } else if (payment.systemFeeId) {
+          const feeName = payment.systemFee?.name || "System Fee";
+          courseTotals[feeName] = (courseTotals[feeName] || 0) + amount;
+          
+          if (!filters?.courseId) {
               totalRevenue += amount;
           }
       } else {

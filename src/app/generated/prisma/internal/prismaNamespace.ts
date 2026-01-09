@@ -389,6 +389,7 @@ export const ModelName = {
   Student: 'Student',
   Course: 'Course',
   CourseFee: 'CourseFee',
+  SystemFee: 'SystemFee',
   Payment: 'Payment',
   Enrollment: 'Enrollment'
 } as const
@@ -406,7 +407,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "branch" | "user" | "student" | "course" | "courseFee" | "payment" | "enrollment"
+    modelProps: "branch" | "user" | "student" | "course" | "courseFee" | "systemFee" | "payment" | "enrollment"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -740,6 +741,72 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    SystemFee: {
+      payload: Prisma.$SystemFeePayload<ExtArgs>
+      fields: Prisma.SystemFeeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SystemFeeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemFeePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SystemFeeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemFeePayload>
+        }
+        findFirst: {
+          args: Prisma.SystemFeeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemFeePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SystemFeeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemFeePayload>
+        }
+        findMany: {
+          args: Prisma.SystemFeeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemFeePayload>[]
+        }
+        create: {
+          args: Prisma.SystemFeeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemFeePayload>
+        }
+        createMany: {
+          args: Prisma.SystemFeeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.SystemFeeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemFeePayload>
+        }
+        update: {
+          args: Prisma.SystemFeeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemFeePayload>
+        }
+        deleteMany: {
+          args: Prisma.SystemFeeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SystemFeeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.SystemFeeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SystemFeePayload>
+        }
+        aggregate: {
+          args: Prisma.SystemFeeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSystemFee>
+        }
+        groupBy: {
+          args: Prisma.SystemFeeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SystemFeeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SystemFeeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SystemFeeCountAggregateOutputType> | number
+        }
+      }
+    }
     Payment: {
       payload: Prisma.$PaymentPayload<ExtArgs>
       fields: Prisma.PaymentFieldRefs
@@ -971,6 +1038,18 @@ export const CourseFeeScalarFieldEnum = {
 export type CourseFeeScalarFieldEnum = (typeof CourseFeeScalarFieldEnum)[keyof typeof CourseFeeScalarFieldEnum]
 
 
+export const SystemFeeScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  amount: 'amount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type SystemFeeScalarFieldEnum = (typeof SystemFeeScalarFieldEnum)[keyof typeof SystemFeeScalarFieldEnum]
+
+
 export const PaymentScalarFieldEnum = {
   id: 'id',
   payment_method: 'payment_method',
@@ -981,6 +1060,7 @@ export const PaymentScalarFieldEnum = {
   userId: 'userId',
   courseId: 'courseId',
   courseFeeId: 'courseFeeId',
+  systemFeeId: 'systemFeeId',
   sms_status: 'sms_status',
   deletedAt: 'deletedAt'
 } as const
@@ -1051,6 +1131,13 @@ export const CourseFeeOrderByRelevanceFieldEnum = {
 } as const
 
 export type CourseFeeOrderByRelevanceFieldEnum = (typeof CourseFeeOrderByRelevanceFieldEnum)[keyof typeof CourseFeeOrderByRelevanceFieldEnum]
+
+
+export const SystemFeeOrderByRelevanceFieldEnum = {
+  name: 'name'
+} as const
+
+export type SystemFeeOrderByRelevanceFieldEnum = (typeof SystemFeeOrderByRelevanceFieldEnum)[keyof typeof SystemFeeOrderByRelevanceFieldEnum]
 
 
 export const PaymentOrderByRelevanceFieldEnum = {
@@ -1208,6 +1295,7 @@ export type GlobalOmitConfig = {
   student?: Prisma.StudentOmit
   course?: Prisma.CourseOmit
   courseFee?: Prisma.CourseFeeOmit
+  systemFee?: Prisma.SystemFeeOmit
   payment?: Prisma.PaymentOmit
   enrollment?: Prisma.EnrollmentOmit
 }

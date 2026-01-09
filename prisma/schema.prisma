@@ -8,32 +8,29 @@ datasource db {
 }
 
 model Branch {
-  id          Int     @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   branch_name String
   show_id     String
-  users       User[]
-  students    Student[]
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
+  students    Student[]
+  users       User[]
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
+  id        Int       @id @default(autoincrement())
+  username  String    @unique
   password  String
-  role      Role     @default(admin)
+  role      Role      @default(admin)
   branchId  Int?
-  branch    Branch?  @relation(fields: [branchId], references: [id])
-  payments  Payment[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-}
+  payments  Payment[]
+  branch    Branch?   @relation(fields: [branchId], references: [id])
 
-enum Role {
-  superAdmin
-  admin
+  @@index([branchId], map: "User_branchId_fkey")
 }
 
 model Student {
@@ -41,59 +38,87 @@ model Student {
   full_name    String       @unique
   phone_number String
   student_id   String       @unique
+  branchId     Int
+  deletedAt    DateTime?
   enrollments  Enrollment[]
   payments     Payment[]
-  branchId     Int
   branch       Branch       @relation(fields: [branchId], references: [id])
-  deletedAt    DateTime?
+
+  @@index([branchId], map: "Student_branchId_fkey")
 }
 
 model Course {
   id          Int          @id @default(autoincrement())
   name        String
+  deletedAt   DateTime?
   fees        CourseFee[]
   enrollments Enrollment[]
   payments    Payment[]
-  deletedAt   DateTime?
 }
 
 model CourseFee {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   courseId  Int
-  course    Course   @relation(fields: [courseId], references: [id])
-  type      String   // e.g. entrance fee, monthly fee, cloth fee
+  type      String
   fee       Float
-  payments  Payment[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+  course    Course    @relation(fields: [courseId], references: [id])
+  payments  Payment[]
+
+  @@index([courseId], map: "CourseFee_courseId_fkey")
+}
+
+model SystemFee {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  amount    Float
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  payments  Payment[]
 }
 
 model Payment {
-  id             Int       @id @default(autoincrement())
+  id             Int        @id @default(autoincrement())
   payment_method String
   fee            Float
-  date           DateTime  @default(now())
+  date           DateTime   @default(now())
   time           String
   studentId      Int
-  student        Student   @relation(fields: [studentId], references: [id])
   userId         Int
-  user           User      @relation(fields: [userId], references: [id])
   courseId       Int?
-  course         Course?   @relation(fields: [courseId], references: [id])
   courseFeeId    Int?
-  courseFee      CourseFee? @relation(fields: [courseFeeId], references: [id])
-  sms_status     Boolean   @default(false)
+  systemFeeId    Int?
+  sms_status     Boolean    @default(false)
   deletedAt      DateTime?
+  courseFee      CourseFee? @relation(fields: [courseFeeId], references: [id])
+  course         Course?    @relation(fields: [courseId], references: [id])
+  student        Student    @relation(fields: [studentId], references: [id])
+  systemFee      SystemFee? @relation(fields: [systemFeeId], references: [id])
+  user           User       @relation(fields: [userId], references: [id])
+
+  @@index([courseFeeId], map: "Payment_courseFeeId_fkey")
+  @@index([courseId], map: "Payment_courseId_fkey")
+  @@index([studentId], map: "Payment_studentId_fkey")
+  @@index([systemFeeId], map: "Payment_systemFeeId_fkey")
+  @@index([userId], map: "Payment_userId_fkey")
 }
 
 model Enrollment {
   studentId  Int
   courseId   Int
-  student    Student  @relation(fields: [studentId], references: [id])
-  course     Course   @relation(fields: [courseId], references: [id])
-  assignedAt DateTime @default(now())
+  assignedAt DateTime  @default(now())
   deletedAt  DateTime?
+  course     Course    @relation(fields: [courseId], references: [id])
+  student    Student   @relation(fields: [studentId], references: [id])
 
   @@id([studentId, courseId])
+  @@index([courseId], map: "Enrollment_courseId_fkey")
+}
+
+enum Role {
+  superAdmin
+  admin
 }

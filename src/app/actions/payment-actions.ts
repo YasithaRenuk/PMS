@@ -515,23 +515,43 @@ export async function getPaymentReports(filters?: {
     let fullyPaidStudents = 0;
     let totalOutstanding = 0;
 
+    // Fetch system fees for global metrics
+    const systemFees = await prisma.systemFee.findMany({ where: { deletedAt: null } });
+    const totalSystemFeesAmount = systemFees.reduce((sum, f) => sum + f.amount, 0);
+
     students.forEach(student => {
-        // Calculate Total Fees
         let totalFees = 0;
-        student.enrollments.forEach((enrollment: any) => {
-           totalFees += enrollment.course.fees.reduce((fSum: number, f: any) => fSum + f.fee, 0);
-        });
+        let totalPaid = 0;
 
-        // Calculate Total Paid
-        const totalPaid = student.payments.reduce((sum, p) => sum + p.fee, 0);
+        if (filters?.courseId) {
+            // Metrics for a specific course
+            const courseEnrollment = student.enrollments.find(e => e.courseId === filters.courseId);
+            if (courseEnrollment) {
+                totalFees = courseEnrollment.course.fees.reduce((fSum, f) => fSum + f.fee, 0);
+                
+                // Sum payments specifically for this course or its fees
+                totalPaid = student.payments
+                    .filter(p => p.courseId === filters.courseId || (p.courseFeeId && courseEnrollment.course.fees.some(f => f.id === p.courseFeeId)))
+                    .reduce((sum, p) => sum + p.fee, 0);
+            }
+        } else {
+            // Global metrics (all courses + system fees)
+            student.enrollments.forEach((enrollment: any) => {
+               totalFees += enrollment.course.fees.reduce((fSum: number, f: any) => fSum + f.fee, 0);
+            });
+            totalFees += totalSystemFeesAmount;
 
-        if (totalPaid >= totalFees && totalFees > 0) { 
-            fullyPaidStudents++;
+            totalPaid = student.payments.reduce((sum, p) => sum + p.fee, 0);
         }
-        
-        // Calculate Outstanding
-        if (totalFees > totalPaid) {
-            totalOutstanding += (totalFees - totalPaid);
+
+        // Only count students who belong to the selected scope (already filtered by studentWhereInput)
+        if (totalFees > 0) {
+            if (totalPaid >= totalFees) {
+                fullyPaidStudents++;
+            }
+            if (totalFees > totalPaid) {
+                totalOutstanding += (totalFees - totalPaid);
+            }
         }
     });
 

@@ -135,14 +135,40 @@ export async function deleteCourse(id: number) {
       throw new Error("Unauthorized");
     }
 
-    const course = await prisma.course.update({
-      where: { id },
-      data: {
-        deletedAt: new Date(),
-      },
+    const course = await prisma.$transaction(async (tx) => {
+      // 1. Soft delete the course
+      const deletedCourse = await tx.course.update({
+        where: { id },
+        data: {
+          deletedAt: new Date(),
+        },
+      });
+
+      // 2. Soft delete all enrollments associated with this course
+      await tx.enrollment.updateMany({
+        where: { courseId: id, deletedAt: null },
+        data: {
+          deletedAt: new Date(),
+        },
+      });
+
+      // 3. Soft delete all fees associated with this course
+      await tx.courseFee.updateMany({
+        where: { courseId: id, deletedAt: null },
+        data: {
+          deletedAt: new Date(),
+        },
+      });
+
+      // Note: We don't soft-delete payments associated with the course here,
+      // as payments are financial records that should typically be preserved
+      // even if the course is deleted, unless explicitly requested.
+
+      return deletedCourse;
     });
 
     revalidatePath("/courses");
+    revalidatePath("/students"); // Students' enrollment list might change
     return { success: true, data: course };
   } catch (error) {
     console.error("Failed to delete course:", error);

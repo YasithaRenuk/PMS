@@ -27,6 +27,7 @@ type FeeItem = {
     type: string;
     fee: string;
     isDeleted?: boolean;
+    customType?: string;
 };
 
 interface CourseDialogProps {
@@ -40,8 +41,15 @@ interface CourseDialogProps {
 export function CourseDialog({ course, trigger, open, onOpenChange, onSuccess }: CourseDialogProps) {
     const [name, setName] = useState(course?.name || "");
     const [fees, setFees] = useState<FeeItem[]>(
-        course?.fees?.map(f => ({ id: f.id, type: f.type, fee: f.fee.toString() })) ||
-        [{ type: "Entrance Fee", fee: "" }]
+        course?.fees?.map(f => {
+            const isStandard = FEE_TYPES.includes(f.type as any);
+            return {
+                id: f.id,
+                type: isStandard ? f.type : "Other",
+                customType: isStandard ? "" : f.type,
+                fee: f.fee.toString()
+            };
+        }) || [{ type: "Entrance Fee", fee: "" }]
     );
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -61,9 +69,20 @@ export function CourseDialog({ course, trigger, open, onOpenChange, onSuccess }:
                 .filter(f => !f.isDeleted)
                 .map(f => {
                     const feeNumber = parseFloat(f.fee);
-                    if (isNaN(feeNumber)) throw new Error(`Invalid fee for ${f.type}`);
-                    return { ...f, fee: feeNumber };
+                    if (isNaN(feeNumber)) throw new Error(`Invalid fee for ${f.type === "Other" ? f.customType : f.type}`);
+
+                    const finalType = f.type === "Other" ? f.customType?.trim() : f.type;
+                    if (!finalType) throw new Error("Fee type is required");
+
+                    return { ...f, type: finalType, fee: feeNumber };
                 });
+
+            // Check for duplicate types
+            const types = formattedFees.map(f => f.type.toLowerCase());
+            const duplicateType = types.find((type, index) => types.indexOf(type) !== index);
+            if (duplicateType) {
+                throw new Error(`Duplicate fee type: ${formattedFees.find(f => f.type.toLowerCase() === duplicateType)?.type}`);
+            }
 
             if (formattedFees.length === 0) {
                 throw new Error("At least one fee is required");
@@ -72,7 +91,11 @@ export function CourseDialog({ course, trigger, open, onOpenChange, onSuccess }:
             // Include deleted fees in update
             const finalFees = [
                 ...formattedFees,
-                ...fees.filter(f => f.isDeleted && f.id).map(f => ({ ...f, fee: parseFloat(f.fee) || 0 }))
+                ...fees.filter(f => f.isDeleted && f.id).map(f => ({
+                    ...f,
+                    type: f.type === "Other" ? f.customType || f.type : f.type,
+                    fee: parseFloat(f.fee) || 0
+                }))
             ];
 
             const result = isEdit
@@ -198,14 +221,29 @@ export function CourseDialog({ course, trigger, open, onOpenChange, onSuccess }:
                                                             <SelectValue placeholder="Select Type" />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            {FEE_TYPES.map((type) => (
-                                                                <SelectItem key={type} value={type}>
-                                                                    {type}
-                                                                </SelectItem>
-                                                            ))}
+                                                            {FEE_TYPES.map((type) => {
+                                                                const isUsed = fees.some((f, idx) => !f.isDeleted && idx !== actualIndex && f.type === type && type !== "Other");
+                                                                if (isUsed) return null;
+                                                                return (
+                                                                    <SelectItem key={type} value={type}>
+                                                                        {type}
+                                                                    </SelectItem>
+                                                                );
+                                                            })}
                                                         </SelectContent>
                                                     </Select>
                                                 </div>
+                                                {feeItem.type === "Other" && (
+                                                    <div className="space-y-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                                                        <Input
+                                                            placeholder="Type custom fee name..."
+                                                            value={feeItem.customType || ""}
+                                                            onChange={(e) => updateFee(actualIndex, 'customType', e.target.value)}
+                                                            className="h-9 bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 focus:ring-2 focus:ring-primary/20"
+                                                            required
+                                                        />
+                                                    </div>
+                                                )}
                                                 <div className="relative">
                                                     <div className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400">
                                                         {/* <IndianRupee className="w-3.5 h-3.5" /> */}
@@ -214,7 +252,7 @@ export function CourseDialog({ course, trigger, open, onOpenChange, onSuccess }:
                                                     <Input
                                                         type="number"
                                                         min="0"
-                                                        step="0.01"
+                                                        step="100"
                                                         value={feeItem.fee}
                                                         onChange={(e) => updateFee(actualIndex, 'fee', e.target.value)}
                                                         required

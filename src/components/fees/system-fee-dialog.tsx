@@ -94,7 +94,7 @@ export function SystemFeeDialog({ fee, trigger, onSuccess }: SystemFeeDialogProp
                             id="amount"
                             type="number"
                             min="0"
-                            step="0.01"
+                            step="100"
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
                             required

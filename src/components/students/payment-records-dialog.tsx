@@ -63,7 +63,7 @@ export function PaymentRecordsDialog({ studentId, studentName, trigger }: Paymen
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>{trigger}</DialogTrigger>
-            <DialogContent className="sm:max-w-[700px]">
+            <DialogContent className="sm:max-w-[1000px]">
                 <DialogHeader>
                     <DialogTitle>Payment Records - {studentName}</DialogTitle>
                 </DialogHeader>

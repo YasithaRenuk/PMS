@@ -252,7 +252,7 @@ export function CourseDialog({ course, trigger, open, onOpenChange, onSuccess }:
                                                     <Input
                                                         type="number"
                                                         min="0"
-                                                        step="0.01"
+                                                        step="100"
                                                         value={feeItem.fee}
                                                         onChange={(e) => updateFee(actualIndex, 'fee', e.target.value)}
                                                         required

@@ -437,7 +437,7 @@ export function PaymentDialog({ studentId, studentName, trigger, onSuccess }: Pa
                                                 <Input
                                                     id="amount"
                                                     type="number"
-                                                    step="0.01"
+                                                    step="100"
                                                     min="0"
                                                     placeholder="0.00"
                                                     value={amount}
